@@ -1,0 +1,146 @@
+# NORMATIVE // DEV 4 — docker-compose.yml
+# Start everything with: docker-compose up --build
+# All services start in the correct dependency order.
+
+version: "3.9"
+
+services:
+
+  # ─────────────────────────────────────────────
+  # Redis — shared message bus
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Frozen LSTM world model (replay + explain). No Redis.
+  world_model:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+      - ./src/world_model/models:/app/src/world_model/models
+    command: ["python", "-m", "src.world_model.api"]
+    environment:
+      PYTHONPATH: /app
+
+  # ─────────────────────────────────────────────
+  # FastAPI backend (Dev 4 — this repo)
+  # ─────────────────────────────────────────────
+  api:
+    build:
+      context: ./src/dashboard_api/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./output:/app/output
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      OUTPUT_DIR: /app/output/incidents
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ─────────────────────────────────────────────
+  # React frontend (Dev 4)
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_WORLD_MODEL_URL: http://localhost:8001
+
+  # ─────────────────────────────────────────────
+  # Log ingestor + simulator (Dev 1)
+  # ─────────────────────────────────────────────
+  ingestor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: ["python", "src/ingestor/normative_ingestor.py"]
+
+  # ─────────────────────────────────────────────
+  # ML models — LSTM + IForest + metrics (Dev 2)
+  # ─────────────────────────────────────────────
+  ml_models:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - ./src/ml_models/models:/app/models
+    command: ["python", "src/ml_models/anomaly_scorer.py"]
+
+  # ─────────────────────────────────────────────
+  # GNN + incident assembler (Dev 3)
+  # ─────────────────────────────────────────────
+  gnn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+      ml_models:
+        condition: service_started
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      OUTPUT_DIR: /app/output/incidents
+    volumes:
+      - ./output:/app/output
+      - ./src/gnn_fusion/models:/app/models
+    command: ["python", "src/gnn_fusion/incident_assembler.py"]
+
+  # ─────────────────────────────────────────────
+  # Simulator (Dev 1) - Generates test events continuously
+  # ─────────────────────────────────────────────
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+      ingestor:
+        condition: service_started
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    # Loop the fast scenario so the dashboard always has new events
+    command: ["sh", "-c", "while true; do python simulator/log_simulator.py --scenario fast --speed 4 --redis-host redis; sleep 10; done"]
+
+volumes:
+  # Shared output volume so both api and gnn can read/write incidents
+  output: {}

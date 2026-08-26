@@ -1,0 +1,26 @@
+{
+  "normalized_event_example": {
+    "event_id": "550e8400-e29b-41d4-a716-446655440000",
+    "timestamp": "2024-01-15T14:23:11Z",
+    "source_type": "auth",
+    "src_ip": "203.0.113.99",
+    "dest_ip": "192.168.1.20",
+    "src_port": 44210,
+    "dest_port": 22,
+    "user": "root",
+    "action": "LOGIN_ATTEMPT",
+    "status": "FAILURE",
+    "process_name": null,
+    "parent_proc": null,
+    "child_proc": null,
+    "bytes_sent": null,
+    "uri_query": null,
+    "payload_flags": [],
+    "file_path": null,
+    "file_ops": null,
+    "cpu_pct": null,
+    "non_admin_user": null,
+    "http_status": null,
+    "raw": {}
+  }
+}

@@ -1,0 +1,217 @@
+================================================================================
+LSTM WORLD MODEL — MITRE STAGE DECODE REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+1. PURPOSE
+----------
+The K-step step proved the LSTM can roll Ŝ_(t+1) ... Ŝ_(t+K) in closed loop.
+The SIH problem also asks for ATT&CK stages, not only binary attack_within_k.
+
+This step maps a 32-d network state to one of seven SIH stages:
+
+    benign | reconnaissance | initial_access | lateral_movement
+    command_and_control | exfiltration | impact
+
+without changing the LSTM and without retraining world_lstm.pt.
+
+Method:
+  1. Fit a multinomial logistic regression on TRAIN days only:
+         scaled S_t  (32-d)  →  stage_id of that window
+  2. Closed-loop roll the frozen LSTM for K=6 (same as K-step eval)
+  3. Decode:
+         LSTM     decoder(Ŝ_(t+k))
+         persist  decoder(S_t)          (copied across k)
+         oracle   decoder(true S_(t+k)) (linear-decoder upper bound)
+
+
+2. WHAT WAS NOT DONE
+--------------------
+  - No LSTM architecture change (still 2×64, 32-d next-state, binary attack head)
+  - No gradient updates to world_lstm.pt
+  - No new stage_head inside model.py
+  - Thresholds 0.15 / 0.05 untouched
+  - 21 Feb was not clipped, logged, or dropped
+
+
+3. DATA AND SPLIT (UNCHANGED)
+-----------------------------
+NPZ:        data/processed/state_windows_multiday.npz
+Checkpoint: src/world_model/models/world_lstm.pt
+Scaler:     src/world_model/models/scaler.npz   (train-only, reused)
+
+Day split:
+  TRAIN  2018-02-14 brute | 15 DoS | 16 DoS | 22 web | 28 infiltration
+  VAL    2018-02-23 web
+  TEST   2018-02-21 DDoS HOIC/LOIC | 2018-03-01 infiltration | 2018-03-02 bot
+
+Train window stage counts (27,340 windows):
+  benign                 22,025
+  initial_access          2,453    (FTP/SSH brute 14 Feb, web 22 Feb)
+  lateral_movement        1,596    (28 Feb infiltration)
+  impact                  1,266    (15/16 Feb DoS)
+  reconnaissance              0    (no CIC port-scan day in this split)
+  command_and_control         0    (bot is 02 Mar — held out)
+  exfiltration                0    (CIC-IDS2018 has no exfil label)
+
+Decoder classes it can emit: benign, initial_access, lateral_movement, impact.
+It physically cannot predict reconnaissance, C2, or exfiltration.
+
+Command:
+  python -m src.world_model.eval_mitre --npz data/processed/state_windows_multiday.npz
+
+JSON: src/world_model/models/mitre_metrics.json
+
+
+4. DECODER
+----------
+sklearn LogisticRegression, multinomial, class_weight=balanced, lbfgs,
+max_iter=2000. Fit on scaled train S_t only.
+
+Train fit (same days it was trained on, not a claim of generalization):
+  accuracy  0.760
+  macro-F1  0.396   (pulled down by 3 zero-support stages in the 7-way average)
+  per-class F1: benign 0.829 | initial_access 0.853 | lateral_movement 0.373 | impact 0.815
+
+Oracle on a split is "how well this linear map reads true future states",
+not "the best possible stage classifier". If true S_(t+k) is far outside
+the train scaler (21 Feb HOIC), oracle collapses.
+
+
+5. RESULTS
+----------
+Accuracy is majority-class sensitive (lots of benign). Macro-F1 averages
+all 7 stages, so unseen C2/recon/exfil always contribute 0.
+
+5.1 Validation — Friday 23 Feb 2018 (web / initial_access, seen family)
+  n = 6,642 k-step windows
+
+       k   LSTM acc   Persist acc   Oracle acc   LSTM mF1   Persist mF1
+       1      0.942         0.849        0.855      0.139         0.143
+       6      0.939         0.849        0.855      0.139         0.143
+     all      0.942         0.848        0.855      0.140         0.142
+
+  Support (pooled over k): benign 38,047 | initial_access 1,805
+  LSTM F1  benign 0.970  initial_access 0.009
+  Persist F1        0.918                 0.076
+
+  LSTM is more accurate by predicting benign more often. Web-attack
+  (T1110/T1190) windows are not linearly separable from benign at 32-d
+  window aggregates on this day. Persist slightly better on the rare
+  initial_access class. Do not sell val accuracy as a MITRE win.
+
+
+5.2 Test — Thursday 01 Mar 2018 (infiltration = lateral_movement / T1021)
+  n = 6,726     THIS IS THE SIH STAGE RESULT
+
+       k   LSTM acc   Persist acc   Oracle acc   LSTM mF1   Persist mF1
+       1      0.804         0.713        0.713      0.221         0.196
+       6      0.796         0.712        0.713      0.221         0.196
+     all      0.800         0.712        0.713      0.221         0.196
+
+  Support (pooled over k): benign 29,195 | lateral_movement 11,160
+  LSTM F1  benign 0.851  lateral_movement 0.698
+  Persist F1        0.787                    0.584
+
+  LSTM beats persist on both accuracy and T1021 F1, at every k, including
+  k=6 (30 s). 28 Feb infiltration was in train; 01 Mar is a new day of
+  the same MITRE stage. Oracle ≈ persist here: the linear decoder on true
+  future states is about as good as copying S_t, so the LSTM gain is from
+  moving Ŝ_(t+k) in a direction the decoder reads as infiltration, not
+  from a stronger classifier.
+
+
+5.3 Test — Friday 02 Mar 2018 (bot = command_and_control / T1071)
+  n = 6,259
+
+       k   LSTM acc   Persist acc   Oracle acc   LSTM mF1   Persist mF1
+     all      0.345         0.338        0.338      0.075         0.082
+
+  Support: benign 13,116 | command_and_control 24,438
+  C2 F1 = 0.000 for LSTM, persist, and oracle.
+
+  Expected: bot never appears in train, so the decoder has no C2 class.
+  Accuracy is "how often we call C2 windows benign / something else".
+  This day is a coverage gap, not a rollout failure.
+
+
+5.4 Test — Wednesday 21 Feb 2018 (HOIC / LOIC-UDP = impact / T1498)
+  n = 632
+
+       k   LSTM acc   Persist acc   Oracle acc   LSTM mF1   Persist mF1
+     all      0.220         0.121        0.008      0.080         0.038
+
+  Support: benign 895 | impact 2,897
+  LSTM impact F1 0.272   persist 0.237
+
+  Oracle accuracy 0.008: true HOIC states sit at extreme z (see K-step /
+  Feb-21 MSE diagnosis). The linear decoder, trained on 15/16 Feb DoS,
+  does not read those vectors as impact. LSTM forecasts stay in-distribution
+  (|z| ≲ 5), so they are easier to decode — that is not a claim that the
+  model "understands HOIC". Same scale-shift caveat as K-step MSE.
+
+
+5.5 Pooled test (do not quote without the per-day split)
+  n = 13,617
+  LSTM acc 0.564 / mF1 0.225   vs persist 0.513 / 0.190
+
+  Pool mixes the 01 Mar win with C2 (unpredictable) and HOIC (OOD).
+  Honest SIH wording uses 01 Mar.
+
+
+6. INTERPRETATION
+-----------------
+What this step proved
+  - Forecast 32-d states can be mapped to SIH MITRE stages without a new
+    LSTM head.
+  - On held-out infiltration (01 Mar), decoding Ŝ_(t+k) beats decoding
+    persist(S_t) for T1021 / lateral_movement through 30 seconds.
+  - Unseen stages (C2, recon, exfil) stay honest zeros instead of being
+    hallucinated by a 7-way LSTM classifier trained on missing labels.
+
+What it did not prove
+  - It is not a full ATT&CK kill-chain predictor. CIC has no exfil, no
+    dedicated recon day in this split, and bot is held out.
+  - Val web attacks are not recovered as initial_access (F1 ≈ 0).
+  - 21 Feb impact decode is not trustworthy (OOD counts).
+  - Oracle is a linear-decoder ceiling, not a Bayes-optimal stage labeler.
+
+Honest SIH wording:
+  Rolled-out world-model states decode to MITRE lateral movement (T1021)
+  on a held-out infiltration day better than persistence. Stages that
+  never appear in train (C2, recon, exfil) are reported as unseen, not
+  as model failures.
+
+
+7. CODE MAP
+-----------
+  src/world_model/labels.py          STAGE_NAMES, STAGE_TECHNIQUE,
+                                     technique_for_stage()
+  src/world_model/dataset.py         load_npz now keeps stage_id
+  src/world_model/rollout.py         collect_kstep_windows(..., stage_ids=)
+                                     y_stage[i,j] = stage_id[i+1+j]
+  src/world_model/mitre_decode.py    StageDecoder, fit_stage_decoder,
+                                     stage_metrics, compare_stage_rollout
+  src/world_model/eval_mitre.py      CLI: frozen LSTM + train-only LogReg
+  src/world_model/model.py           UNCHANGED
+  tests/test_world_model_mitre.py    32 checks
+  tests/test_world_model_rollout.py  20 checks (regression)
+
+Reproduce:
+  cd Normnative-
+  python tests/test_world_model_mitre.py
+  python tests/test_world_model_rollout.py
+  python -m src.world_model.eval_mitre --npz data/processed/state_windows_multiday.npz
+
+
+8. NEXT STEP AFTER THIS REPORT
+------------------------------
+Explanations (SHAP / feature attribution, or LSTM attention) on why
+Ŝ_(t+k) decoded as a given stage — still without retraining the LSTM.
+Then wire the frozen model + decoder into FastAPI / the dashboard.
+
+================================================================================
+End of MITRE stage-decode report
+================================================================================

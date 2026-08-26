@@ -1,0 +1,111 @@
+================================================================================
+LSTM WORLD MODEL — NETWORK STATE AS VECTOR + GRAPH
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+0. WHICH SIH TASK THIS IS
+-------------------------
+Problem statement (Section 2):
+
+  “Represent network state using feature vectors and graphs.”
+
+This is the STATE REPRESENTATION task. It is NOT “use a GNN as the
+dynamics model.” LSTM remains the frozen world model (2×64, 32-d).
+
+
+1. WHAT WAS ALREADY TRUE
+------------------------
+Feature vector S_t
+  32-d, every 5 seconds, from CICFlowMeter columns.
+  Indices 0–21 flow-level, 22–28 packet-level, 29–31 PCAP stubs = 0.
+  This is what the LSTM sees. Unchanged.
+
+Temporal “state graph” on the dashboard
+  A chain t-7 → … → t → Ŝ_{t+5s} → … → Ŝ_{t+30s}.
+  That visualises P(S_{t+1} | history). It is not a communication graph.
+
+
+2. WHAT WAS MISSING
+-------------------
+A graph of WHO talks to WHOM in the same 5-second bin as S_t.
+
+CIC ML CSVs omit Src IP / Dst IP, so a host graph was previously
+declared impossible without PCAP. That is only half true: dest ports
+are always present, so a service graph is well-defined on the same
+files the LSTM was trained on.
+
+
+3. REPRESENTATION (DUAL, SAME WINDOW)
+-------------------------------------
+For each 5-second bin:
+
+  S_t  ∈ R^32     feature vector (LSTM input, frozen)
+  G_t  = (V, E)   directed communication graph (sidecar, not LSTM input)
+
+Host mode (Src IP and Dst IP present — GeneratedLabelledFlows / PCAP)
+  V = hosts
+  E = aggregated Src IP → Dst IP
+      edge weight = flow count, bytes, packets
+
+Service mode (CIC-IDS2018 TrafficForML default)
+  V = one “unobserved sources” node + dest-port nodes
+  E = unobserved → dest port
+  Honest about missing IPs. A port-scan still looks like a STAR
+  (high out-degree from the client supernode). A flood looks like
+  high in-degree on one dest port.
+
+Host–service mode (only Src IP)
+  V = source hosts + dest ports
+  E = host → dest port
+
+Graph stats (for the defender, not for input_dim):
+  n_nodes, n_edges, n_flows
+  max_out_degree  (fan-out / scan)
+  max_in_degree   (fan-in / flood)
+  density, hub
+
+
+4. MUSTS HELD
+-------------
+  model.py            unchanged
+  world_lstm.pt       not updated
+  scaler.npz          not updated
+  input_dim           still 32
+  Training NPZ        still vector-only (include_graphs defaults False)
+  Thresholds          0.15 / 0.05 unchanged
+  Transformer / GNN as the DYNAMICS model   still unchecked
+
+
+5. CODE
+-------
+  src/world_model/state_graph.py     build_window_graph()
+  src/world_model/windows.py         include_graphs=True sidecar
+  src/world_model/service.py         upload/sample attach state_graph
+  frontend/.../ForecastDashboard.jsx G_t panel + existing S→Ŝ chain
+  tests/test_world_model_graphs.py   23 checks
+  tests/test_world_model_api.py      upload JSON includes G_t
+
+
+6. HOW TO SEE IT
+----------------
+  python -m src.world_model.api          # :8001
+  cd frontend && npm run dev             # :3000
+  Dashboard → RUN SYNTHETIC SAMPLE
+    or UPLOAD a CIC CSV
+
+  Panel “G_t · communication graph (same 5s window as S_t)”
+  sits above the existing observed-S → predicted-Ŝ chain.
+
+
+7. WHAT THIS IS NOT
+-------------------
+  Not a GNN world model.
+  Not Src/Dst IP inside the 32-d vector (that would break the LSTM).
+  Not PCAP TTL / fragment / retransmit fill-in.
+  Those remain later tasks, one at a time.
+
+================================================================================
+End of state-graph report
+================================================================================

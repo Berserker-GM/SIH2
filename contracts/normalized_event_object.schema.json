@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NormalizedEventObject",
+  "type": "object",
+  "required": ["event_id", "timestamp", "source_type", "src_ip", "dest_ip", "action", "payload_flags", "raw"],
+  "properties": {
+    "event_id":       { "type": "string" },
+    "timestamp":      { "type": "string" },
+    "source_type":    { "type": "string", "enum": ["network","endpoint","auth","syslog"] },
+    "src_ip":         { "type": "string" },
+    "dest_ip":        { "type": "string" },
+    "src_port":       { "type": "integer" },
+    "dest_port":      { "type": "integer" },
+    "user":           { "type": ["string","null"] },
+    "action":         { "type": "string" },
+    "status":         { "type": ["string","null"] },
+    "process_name":   { "type": ["string","null"] },
+    "parent_proc":    { "type": ["string","null"] },
+    "child_proc":     { "type": ["string","null"] },
+    "bytes_sent":     { "type": ["integer","null"] },
+    "uri_query":      { "type": ["string","null"] },
+    "payload_flags":  { "type": "array" },
+    "file_path":      { "type": ["string","null"] },
+    "file_ops":       { "type": ["integer","null"] },
+    "cpu_pct":        { "type": ["number","null"] },
+    "non_admin_user": { "type": ["boolean","null"] },
+    "http_status":    { "type": ["integer","null"] },
+    "raw":            { "type": "object" }
+  }
+}

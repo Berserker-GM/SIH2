@@ -1,0 +1,108 @@
+================================================================================
+LSTM WORLD MODEL — DASHBOARD WIRING REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+1. PURPOSE
+----------
+Put the frozen world-model answers on the existing SOC dashboard:
+
+  Something bad?   P(attack in 30s) vs threshold 0.15
+  What?            MITRE stage + technique of Ŝ_(t+6)
+  Why?             attack saliency / stage contributions / 30s deltas
+
+LSTM architecture and weights were not changed. No retraining.
+
+
+2. WHAT WAS WIRED
+-----------------
+New HTTP service (no Redis):
+
+    python -m src.world_model.api          # http://0.0.0.0:8001
+
+  GET  /health
+  GET  /api/world-model/status
+  GET  /api/world-model/examples
+  GET  /api/world-model/forecast?i=N       replay 01 Mar explanation N
+  POST /api/world-model/forecast           live 8×32 history (needs LSTM loaded)
+
+Dashboard:
+
+  frontend/src/components/WorldModelPanel.jsx
+  mounted in UnifiedDashboard center column (under the ticker)
+
+  Vite proxy: /api/world-model → :8001  (other /api still → :8000)
+
+docker-compose: world_model service on port 8001.
+
+
+3. HOW TO RUN THE DEMO
+----------------------
+Terminal A (repo root Normnative-/):
+  python -m src.world_model.api
+
+Terminal B (frontend/):
+  npm install --legacy-peer-deps
+  npm run dev
+
+Open http://localhost:3000/
+Panel: WORLD MODEL · 30s FORECAST
+Buttons: PREV / NEXT cycle eight held-out 01 Mar windows.
+
+
+4. VERIFICATION (25 Aug 2026)
+-----------------------------
+API tests:  tests/test_world_model_api.py   18/18 pass
+
+Live API:
+  GET /api/world-model/status
+    frozen=true  input_dim=32  k=6  threshold=0.15  n_examples=8
+    ready_for_live=false  (replay uses saved explanations; LSTM not
+    reloaded into this process — POST live is 503 until injected)
+
+  GET /api/world-model/forecast?i=0
+    stage=lateral_movement  technique=T1021  something_bad=false
+    narrative includes attack P, MITRE stage, and why features
+
+Browser (http://localhost:3000/):
+  Panel rendered: "No binary attack alert"
+  What: lateral movement · T1021
+  P(attack in 30s)=0.001  threshold=0.15
+  Why columns populated (bytes_fwd_sum, port_scan_score, dest_port_entropy)
+  NEXT requested forecast?i=1 and why_change switched to iat_std
+
+The Redis SOC backend was not running, so incident feed used mock data.
+The world-model panel does not depend on Redis.
+
+
+5. CONSTRAINTS HELD
+-------------------
+  model.py          unchanged
+  world_lstm.pt     not updated
+  attack threshold  0.15
+  32-d / 2×64 LSTM  unchanged
+
+
+6. CODE MAP
+-----------
+  src/world_model/service.py                 jsonable + WorldModelRuntime
+  src/world_model/api.py                     FastAPI app, port 8001
+  tests/test_world_model_api.py              18 checks
+  frontend/src/components/WorldModelPanel.jsx
+  frontend/src/pages/UnifiedDashboard.jsx    panel mount
+  frontend/vite.config.js                    /api/world-model proxy
+  docker-compose.yml                         world_model service
+
+
+7. STILL NOT LIVE TRAFFIC
+-------------------------
+This is CIC-IDS2018 01 Mar replay, not a packet tap.
+POST /api/world-model/forecast can run the frozen LSTM on a new 8×32
+history once the runtime is constructed with world_lstm.pt (not done
+in the default API process, which serves saved explanations).
+
+================================================================================
+End of dashboard wiring report
+================================================================================

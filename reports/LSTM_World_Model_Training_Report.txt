@@ -1,0 +1,237 @@
+================================================================================
+LSTM WORLD MODEL — TRAINING REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+1. PURPOSE
+----------
+Train a learned model of network state-transition dynamics, not a static
+flow classifier.
+
+Given a short history of network states, the model must:
+  (a) predict the next state S_(t+1)   —  P(S_(t+1) | S_t, ..., S_(t-L+1))
+  (b) estimate attack-within-K probability (infiltration in the next 30 s)
+
+This is compared against Logistic Regression on the same 32 features, as
+required by the SIH problem statement.
+
+
+2. DATASET
+----------
+Source:     CSE-CIC-IDS2018 (UNB / AWS Open Data)
+            Official page: https://www.unb.ca/cic/datasets/ids-2018.html
+            NCIIPC does not host a copy; this is the organiser-listed public corpus.
+
+Day used:   Wednesday 28 February 2018
+            File: Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv (~209 MB)
+            Attack type: Infilteration (CIC spelling) — internal infiltration
+
+Raw flows:  613,071 labelled CICFlowMeter rows
+            Benign        544,200
+            Infilteration  68,871
+
+State windows (built before training):
+  Window length     5 seconds
+  Stride            5 seconds
+  Lookahead K       6 windows  (= 30 seconds)
+  State vector      32 dimensions (flow-level + packet-level CIC stats)
+  Pair file         Normnative-/data/processed/state_windows.npz
+  Pairs produced    6,761  (S_t, S_(t+1))
+
+32-d feature vector S_t
+  Flow-level (0-21):
+    flow_count, unique_dst_ports, dest_port_entropy, tcp_ratio, udp_ratio,
+    bytes_fwd_sum, bytes_bwd_sum, bidirectional_ratio, pkts_fwd_sum,
+    pkts_bwd_sum, duration_mean, duration_max, iat_mean, iat_std, iat_max,
+    syn_flag_sum, ack_flag_sum, fin_flag_sum, rst_flag_sum, psh_flag_sum,
+    urg_flag_sum, down_up_ratio_mean
+  Packet-level from CICFlowMeter (22-28):
+    pkt_len_mean, pkt_len_std, pkt_len_max, init_fwd_win_mean,
+    init_bwd_win_mean, fwd_psh_flags_sum, port_scan_score
+  PCAP-only stubs (29-31, currently zero until PCAP parsing):
+    ttl_variance, ip_fragment_flags, retransmit_count
+
+Label used for the classification head:
+  attack_within_k = 1 if any attack occurs in the next K=6 windows.
+
+
+3. TRAIN / VAL / TEST SPLIT
+---------------------------
+Split is TEMPORAL (sorted by timestamp). No shuffling. No future leakage.
+Scaler (mean/std) is fit on TRAIN states only.
+
+                    rows     attack_within_k rate    time role
+  Train (70%)       4,732    14.8%                   earlier part of the day
+  Val   (15%)       1,014    54.2%                   first infiltration wave
+  Test  (15%)       1,015    35.0%                   later time (held-out)
+
+After building length-8 sequences:
+  Train sequences   4,725
+  Val sequences     1,007
+  Test sequences    1,008
+
+NOTE: class rate shifts a lot across the day (15% -> 54% -> 35%). That is
+expected for a single attack-day capture and is the main reason test
+classification is harder than validation.
+
+
+4. MODEL
+--------
+Name:       LSTMWorldModel
+File:       Normnative-/src/world_model/model.py
+Type:       sequence world model  (NOT the old autoencoder)
+
+Architecture:
+  Input           (batch, seq_len=8, 32)
+  LSTM            2 layers, hidden=64, dropout=0.2, batch_first=True
+  Head A          Linear 64->64 ReLU Dropout Linear 64->32     next state
+  Head B          Linear 64->32 ReLU Dropout Linear 32->1      attack logit
+
+This is not reconstruction of the current window. The LSTM is trained to
+forecast the next network state and a future-attack probability.
+
+
+5. TRAINING SETUP
+-----------------
+Device:                 CPU  (PyTorch 2.13.0+cpu, no CUDA on this machine)
+Optimiser:              Adam, lr=1e-3, weight_decay=1e-5
+Batch size:             64
+Max epochs:             40
+Early stopping:         patience 8 on validation loss
+Gradient clip:          max_norm = 1.0
+Loss:                   MSE(next_state) + 0.5 * BCEWithLogits(attack)
+Positive class weight:  clipped at 3.0  (train is only 15% positive)
+Decision threshold:     chosen on VALIDATION to maximise F1
+                          LSTM threshold   = 0.05
+                          LogReg threshold = 0.30
+Normalisation:          per-feature z-score from train only
+                        (zero-variance features, e.g. PCAP stubs, std=1)
+
+Command:
+  python -m src.world_model.train --npz data/processed/state_windows.npz
+
+Runtime: about 30-40 seconds on CPU.
+
+
+6. BASELINES
+------------
+(1) Logistic Regression
+    Same 32 features, last window only (no sequence, no next-state head).
+    sklearn LogisticRegression, class_weight="balanced", solver=lbfgs.
+    This is the SIH-required baseline.
+
+(2) Persist dynamics
+    Predict S_(t+1) = S_t.
+    Used only to check whether the LSTM actually learned transitions.
+    Logistic Regression does not predict S_(t+1).
+
+
+7. RESULTS — VALIDATION
+-----------------------
+Attack-within-K classification (val, n=1007, 54.6% positive)
+
+  Model      Precision   Recall     F1      FPR     Accuracy
+  LSTM          0.835     0.909    0.870   0.217      0.852
+  LogReg        0.609     0.909    0.729   0.702      0.632
+
+  Confusion LSTM:    TP=500  FP=99   TN=358  FN=50
+  Confusion LogReg:  TP=500  FP=321  TN=136  FN=50
+
+Next-state dynamics (scaled feature space; lower is better)
+
+  Model      MSE      MAE      RMSE
+  LSTM      0.914    0.480    0.956
+  Persist   1.527    0.576    1.236
+
+On validation the LSTM beats LogReg on F1, FPR and accuracy, and beats
+persist on next-state MSE.
+
+
+8. RESULTS — TEST (HELD-OUT LATER TIME)
+---------------------------------------
+Attack-within-K classification (test, n=1008, 34.5% positive)
+
+  Model      Precision   Recall     F1      FPR     Accuracy
+  LSTM          0.421     0.615    0.500   0.445      0.575
+  LogReg        0.365     0.833    0.507   0.765      0.441
+
+  Confusion LSTM:    TP=214  FP=294  TN=366  FN=134
+  Confusion LogReg:  TP=290  FP=505  TN=155  FN=58
+
+Next-state dynamics
+
+  Model      MSE      MAE      RMSE
+  LSTM      0.830    0.428    0.911
+  Persist   1.510    0.488    1.229
+
+  LSTM MSE reduction vs persist: about 45%.
+
+
+9. INTERPRETATION
+-----------------
+What worked
+  - The LSTM learned temporal dynamics. Next-state MSE is clearly better
+    than copying the current state. That is the core SIH world-model claim.
+  - On validation (first infiltration wave) the LSTM is a better detector
+    than LogReg: higher F1 (0.87 vs 0.73) and much lower false-positive
+    rate (0.22 vs 0.70).
+  - On test, LSTM accuracy is higher (0.575 vs 0.441) and FPR is lower
+    (0.445 vs 0.765). LogReg wins F1 only by labelling most windows as
+    attack (recall 0.83, FPR 0.77).
+
+What is limited
+  - Test F1 is essentially tied (0.500 vs 0.507). This is not a failure of
+    the architecture so much as a distribution shift: train is 15% attack,
+    val 54%, test 35% (second part of the infiltration day).
+  - Only one CIC day was used. Adding SSH-brute, web-attack and botnet
+    days would give a fairer held-out test.
+  - TTL / fragment / retransmit (dims 29–31) stay 0 in trained S_t.
+    Scapy now fills them as a pcap_stats sidecar at inference; injecting
+    them into the 32-d vector needs a retrain.
+  - K=6 (30 s) lookahead is short relative to CIC's long infiltration
+    blocks, so "pre-compromise" examples are rare.
+
+Honest SIH wording:
+  The world model learns P(S_(t+1)|history) with a measurable MSE gain.
+  It is not yet a high-precision early-warning system on unseen hours of
+  the same day. Classification should be reported with FPR, not F1 alone.
+
+
+10. SAVED ARTIFACTS
+-------------------
+  Normnative-/src/world_model/models/world_lstm.pt     trained LSTM weights
+  Normnative-/src/world_model/models/scaler.npz        train-only mean/std
+  Normnative-/src/world_model/models/metrics.json      machine-readable scores
+  Normnative-/src/world_model/models/readme.txt        file map
+
+Reproduce:
+  cd Normnative-
+  python -m src.world_model.train --npz data/processed/state_windows.npz
+  python tests/test_world_model_train.py
+
+
+11. CODE MAP
+------------
+  src/world_model/windows.py           5-second state S_t from CIC CSV
+  src/world_model/prepare_dataset.py   CSV -> state_windows.npz
+  src/world_model/dataset.py           temporal split, scaler, sequences
+  src/world_model/model.py             LSTMWorldModel
+  src/world_model/train.py             train LSTM + LogReg, write metrics
+  src/world_model/metrics.py           F1 / precision / recall / FPR / MSE
+  tests/test_world_model_train.py      split, scaler leakage, forward shapes
+
+
+12. RECOMMENDED NEXT STEPS
+--------------------------
+  1. Download additional CIC-IDS2018 days (SSH brute, web, botnet) and
+     retrain so test is not the same attack type / same afternoon.
+  2. K-step rollout: feed predicted S_(t+1) back in for t+2 ... t+K.
+  3. Map predicted future state to MITRE stage (not only binary attack).
+  4. Add SHAP or LSTM attention as driving-feature explanations.
+  5. Wire inference into the existing FastAPI + dashboard.
+
+================================================================================
+End of report
+================================================================================

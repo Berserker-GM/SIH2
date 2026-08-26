@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+/* ===== Premium Modern Enterprise Security Theme ===== */
+@theme {
+  --color-bg-primary: #020813;
+  --color-bg-secondary: #051021;
+  --color-bg-card: rgba(2, 10, 22, 0.75);
+  --color-border: #0088cc;
+  --color-border-bright: #00e5ff;
+  --color-text-primary: #e0f2fe;
+  --color-text-secondary: #7dd3fc;
+  --color-text-muted: #38bdf8;
+  
+  --color-accent: #00e5ff; /* Vibrant Glowing Cyan */
+  --color-accent-hover: #ffffff;
+  --color-critical: #ff003c; /* Vibrant Red/Pink */
+  --color-high: #ff6600;
+  --color-medium: #ffcc00;
+  --color-low: #00ffaa;
+  --color-success: #00ffaa;
+
+  --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-sans);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Subtle gradient background instead of grid */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at 50% -20%, rgba(0, 229, 255, 0.2) 0%, transparent 70%),
+              radial-gradient(circle at 0% 100%, rgba(0, 85, 255, 0.25) 0%, transparent 60%);
+  z-index: -3;
+  pointer-events: none;
+}
+
+/* Global Radar Sweep in Background */
+body::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 150vw;
+  height: 150vw;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(from 0deg, transparent 70%, rgba(0, 212, 255, 0.05) 90%, rgba(0, 212, 255, 0.2) 100%);
+  border-radius: 50%;
+  z-index: -2;
+  pointer-events: none;
+  animation: radar-sweep 15s linear infinite;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+}
+
+@keyframes radar-sweep {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Premium Clean Panels */
+.panel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 8px; /* Softer, premium corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.02);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel:hover {
+  border-color: var(--color-border-bright);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 212, 255, 0.15), inset 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Modern Severity Badges */
+.severity-critical { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+.severity-high { background: rgba(245, 158, 11, 0.1); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.2); }
+.severity-medium { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2); }
+.severity-low { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-live { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* Recharts Overrides */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--color-border) !important;
+  stroke-dasharray: 0 !important;
+}
+.recharts-text {
+  fill: var(--color-text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.75rem !important;
+}
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  font-family: var(--font-sans) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Horizontal scrolling marquee */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Leaflet Dark Mode Popups */
+.custom-map-popup .leaflet-popup-content-wrapper {
+  background: #161B22 !important;
+  color: #F0F6FC !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+  padding: 0 !important;
+}
+.custom-map-popup .leaflet-popup-content {
+  margin: 0 !important;
+}
+.custom-map-popup .leaflet-popup-tip {
+  background: #161B22 !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* Cyber Map Styles */
+.cyber-grid-bg {
+  background-color: #030811 !important;
+  background-image: linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  background-position: center center !important;
+}
+
+.glowing-marker {
+  filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+  mix-blend-mode: screen;
+}
+
+.leaflet-container {
+  background: transparent !important;
+}
+

@@ -1,0 +1,125 @@
+================================================================================
+LSTM WORLD MODEL — EXPLANATION ("WHY") REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+0. PIPELINE AUDIT (this is why this step existed)
+-------------------------------------------------
+The SIH story the dashboard must tell:
+
+  Live traffic → 32-d S_t → LSTM → 30s Ŝ → attack P + MITRE stage
+       → "something bad?" → "what?" → "why?" → Dashboard
+
+Status after this step:
+
+  Live / current traffic     NOT wired. Offline CIC-IDS2018 CSVs only.
+                             The existing FastAPI/Redis dashboard is the
+                             old autoencoder + GNN demo, not this LSTM.
+  32-d state                 YES  windows.py / prepare_dataset.py
+  LSTM (2×64, 32-d)          YES  world_lstm.pt  (frozen)
+  30-second predicted future YES  closed-loop K=6 rollout
+  Attack probability         YES  attack head, threshold 0.15
+  MITRE stage                YES  train-only LogReg decoder
+  "Something bad?"           YES  something_bad = P ≥ 0.15
+  "What is likely?"          YES  stage + technique_id of Ŝ_(t+6)
+  "Why does it think that?"  YES  this step (no SHAP dependency)
+  Dashboard                  NOT wired to the world model yet
+
+The science chain through "why" is in place. The live dashboard chain is not.
+
+
+1. PURPOSE
+----------
+Map one history window to three sentences without retraining:
+
+  Something bad is likely to happen?   P(attack within 30s) vs 0.15
+  What is likely to happen?            MITRE stage of Ŝ_(t+6)
+  Why does the model think that?       feature-level reasons
+
+LSTM architecture and weights were not changed. Thresholds 0.15 / 0.05
+were not changed.
+
+
+2. METHOD (no extra Python packages)
+------------------------------------
+why_attack
+  Input saliency of the existing attack head:
+  mean over the 8-step history of |∂ logit / ∂ x_j|.
+  Answers: which current 32-d features push "something bad".
+
+why_stage
+  Linear LogReg contribution on the forecast state:
+  coef[stage] * Ŝ_(t+6).
+  Answers: which forecast features make the decoder emit that MITRE stage.
+
+why_change
+  Ŝ_(t+6) − S_t  (scaled space, same as the LSTM).
+  Answers: what the world model thinks will move in 30 seconds.
+
+Narrative is assembled from the top feature of each list.
+
+
+3. COMMAND AND ARTIFACTS
+------------------------
+  python tests/test_world_model_explain.py
+  python -m src.world_model.eval_explain --npz data/processed/state_windows_multiday.npz
+
+JSON: src/world_model/models/explain_examples.json
+Focus day: 2018-03-01 (held-out infiltration / T1021)
+
+
+4. 01 MAR EXAMPLES (first 8 non-benign-stage windows)
+-----------------------------------------------------
+Scanned 347 k-step windows; dumped 8. All eight:
+
+  something_bad = False   (attack P from 0.00 to 0.13, all < 0.15)
+  stage           = lateral_movement (T1021 Remote Services)
+
+Typical narrative:
+  "No attack alert (probability 0.09 < 0.15). What is likely:
+   lateral_movement (T1021 Remote Services). Why: the attack head is
+   driven most by pkt_len_max; the stage decode leans on port_scan_score;
+   the 30s forecast changes dest_port_entropy most."
+
+This disagreement is real, not a bug:
+  - The binary head was calibrated on val F1 (threshold 0.15) and is
+    conservative on these 01 Mar prefixes.
+  - The stage decoder, looking at Ŝ_(t+6), already reads infiltration
+    (the 01 Mar MITRE win from the previous report).
+  SIH wording: the world model can say WHAT before the binary alarm
+  crosses the official threshold. Show both, do not hide the gap.
+
+
+5. CONSTRAINTS HELD
+-------------------
+  model.py          unchanged (no stage_head, no SHAP, no extra LSTM layer)
+  world_lstm.pt     not updated
+  scaler.npz        train-only, reused
+  LSTM threshold    0.15
+  LogReg threshold  0.05 (binary baseline; unused here)
+
+
+6. CODE MAP
+-----------
+  src/world_model/explain.py        attack_saliency, stage_contributions,
+                                    top_features, explain_forecast
+  src/world_model/eval_explain.py   CLI dump of 01 Mar examples
+  tests/test_world_model_explain.py 20 checks
+
+
+7. NEXT STEP AFTER THIS REPORT
+------------------------------
+Wire the frozen pipeline into FastAPI / the existing dashboard:
+
+  8×32 history → explain_forecast(...) → incident JSON
+    {attack_probability, something_bad, stage, technique_id,
+     why_attack, why_stage, why_change, narrative}
+
+Live CIC-stream ingest is optional after that; replay of 01 Mar windows
+is enough for a SIH demo if a live tap is not available.
+
+================================================================================
+End of explanation report
+================================================================================

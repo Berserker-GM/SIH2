@@ -1,0 +1,13 @@
+# CSE-CIC-IDS2018 / CIC-IDS2017
+# Official source (organizers point here; NCIIPC does not host a copy):
+#   https://www.unb.ca/cic/datasets/ids-2018.html
+#   s3://cse-cic-ids2018/  (AWS Open Data, no account required)
+#
+# Patterns are relative to this directory (data/).
+raw/*
+!raw/.gitkeep
+processed/*
+!processed/.gitkeep
+!processed/live_slices/
+!processed/live_slices/**
+!fixtures/

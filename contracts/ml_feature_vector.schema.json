@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MLFeatureVector",
+  "type": "object",
+  "required": ["event_id", "host_key", "window_events", "feature_vector"],
+  "properties": {
+    "event_id":             { "type": "string" },
+    "host_key":             { "type": "string" },
+    "window_events":        { "type": "array", "items": { "type": "string" } },
+    "feature_vector":       { "type": "array", "items": { "type": "number" }, "minItems": 11, "maxItems": 11 },
+    "login_fail_count":     { "type": "integer" },
+    "login_success_count":  { "type": "integer" },
+    "unique_dest_ips":      { "type": "integer" },
+    "bytes_sent_total":     { "type": "integer" },
+    "file_ops_count":       { "type": "integer" },
+    "cpu_pct_avg":          { "type": "number" },
+    "payload_flag_count":   { "type": "integer" },
+    "inter_arrival_ms_avg": { "type": "number" },
+    "entropy_dest_ports":   { "type": "number" },
+    "src_port_norm":        { "type": "number" },
+    "dest_port_norm":       { "type": "number" }
+  }
+}

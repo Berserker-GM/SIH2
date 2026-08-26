@@ -1,0 +1,2 @@
+# CSE-CIC-IDS2018 flow CSVs live here after:
+#   python -m src.world_model.download_cic --dataset infiltration

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AnomalyScoreObject",
+  "type": "object",
+  "required": ["event_id", "timestamp", "lstm_score", "iforest_score", "composite_ml_score", "is_anomaly", "window_events"],
+  "properties": {
+    "event_id":           { "type": "string" },
+    "timestamp":          { "type": "string" },
+    "lstm_score":         { "type": "number", "minimum": 0, "maximum": 1 },
+    "iforest_score":      { "type": "number", "minimum": 0, "maximum": 1 },
+    "composite_ml_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "is_anomaly":         { "type": "boolean" },
+    "window_events":      { "type": "array", "items": { "type": "string" } }
+  }
+}

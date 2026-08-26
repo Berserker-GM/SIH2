@@ -1,0 +1,26 @@
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.env
+.venv/
+venv/
+.serena/
+incidents/
+output/
+*.egg-info/
+.pytest_cache/
+frontend/dist/
+
+# CIC raw dumps and window NPZs (GB-scale). Keep live replay JSON.
+data/raw/*.csv
+data/processed/*.npz
+data/processed/*.json
+!data/processed/live_slices/
+!data/processed/live_slices/**
+# GitHub 100MB file limit
+data/processed/live_slices/Friday-16-02-2018_TrafficForML_CICFlowMeter_s90.csv

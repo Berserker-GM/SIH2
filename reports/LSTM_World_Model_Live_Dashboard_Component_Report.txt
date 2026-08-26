@@ -1,0 +1,561 @@
+================================================================================
+LSTM WORLD MODEL — LIVE DASHBOARD COMPONENT REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Team prototype: Normnative (Normative)
+Date: 25 August 2026
+Code: Normnative-/
+Dashboard: http://localhost:3000/     API: http://localhost:8001
+================================================================================
+
+HOW TO READ THIS DOCUMENT
+-------------------------
+This report explains EVERY panel on the live CSV dashboard (the screen that
+replaced the old SOC “NORMATIVE SOC OPERATOR” skin).
+
+It also maps each panel to the SIH problem statement:
+
+  CSV / PCAP / live telemetry
+          ↓
+     extract state S_t          (32-d feature VECTOR every 5s)
+          ↓
+       LSTM                     (sequence model of P(S_{t+1} | history))
+          ↓
+  predict next 30 seconds       (closed-loop K=6)
+          ↓
+  attack probability + MITRE stage + WHY
+          ↓
+      dashboard
+
+What you are looking at in the screenshots is NOT the old hardcoded 01 Mar
+replay JSON. It is:
+
+  CIC-shaped CSV  →  5s windows  →  last 8 × 32  →  frozen LSTM  →  live JSON
+
+Frozen on purpose (must not change):
+  world_lstm.pt, scaler.npz, LSTM 2×64, input_dim=32, seq_len=8,
+  K=6, attack threshold 0.15. No retraining for this report.
+
+
+--------------------------------------------------------------------------------
+0. WHAT THE SCREENSHOTS SHOW (ONE SENTENCE)
+--------------------------------------------------------------------------------
+A synthetic CIC-style CSV was windowed into 23 states; the last 8 consecutive
+5-second vectors were fed to the frozen LSTM; the model rolled 30 seconds
+ahead and said BENIGN (P=0.000 < 0.15), then drew the 32-d vector S_t and
+the 8×32 history the LSTM actually saw.
+
+
+--------------------------------------------------------------------------------
+1. HEADER BAR
+--------------------------------------------------------------------------------
+1.1 Title — “NORMATIVE · WORLD MODEL”
+    Product name. “World model” means: we do not classify one flow as
+    attack/benign. We learn how the NETWORK STATE evolves, then simulate
+    a short future.
+
+1.2 Subtitle — “CSV → 32-d state → 30s forecast”
+    The SIH pipeline in six words. Matches the problem’s “move beyond
+    static intrusion classification towards predictive cyber defence.”
+
+1.3 Badge: LSTM FROZEN
+    Weights in src/world_model/models/world_lstm.pt are not updated at
+    inference. Jury talking point: the live demo uses the SAME model that
+    beat persist ~41% MSE on held-out 01 Mar infiltration.
+
+1.4 Badge: LIVE INFERENCE READY  (green)
+    GET /api/world-model/status reported ready_for_live=true, i.e. all
+    three artefacts loaded:
+      - LSTM checkpoint     world_lstm.pt
+      - train-only scaler   scaler.npz
+      - MITRE stage decoder (LogReg fit on TRAIN days only, not test days)
+    If this badge is red (“API OFFLINE” / “LSTM NOT LOADED”), the page
+    will not fall back to saved 01 Mar examples. That mixed behaviour
+    was the old SOC dashboard and has been removed.
+
+1.5 Badge: “:8001 · K=6 · thr 0.15”
+    :8001     FastAPI world-model service. ONE process only.
+              Do not start a second copy (port already in use = mixed API).
+    K=6       six 5-second forecast steps = 30 seconds ahead.
+    thr 0.15  binary alert if P(attack in 30s) ≥ 0.15
+              (chosen on VAL F1, then frozen; do not retune for the demo).
+
+
+--------------------------------------------------------------------------------
+2. INPUT / UPLOAD SECTION
+--------------------------------------------------------------------------------
+This is the missing plumbing from the overall report: the dashboard now
+CONSUMES a CSV instead of displaying precomputed explain_examples.json.
+
+2.1 Instruction paragraph
+    Tells the operator the exact scientific path:
+      CICFlowMeter CSV
+        → 5-second 32-d states
+        → latest 8 consecutive windows (40s of history)
+        → frozen LSTM rolled six steps
+        → attack P + MITRE + why
+    Explicitly: “not the saved 01 Mar replay JSON.”
+
+2.2 Drop zone — “Drop CIC-IDS2018 CSV here”
+    Accepts a real CSE-CIC-IDS2018 TrafficForML CSV.
+    Required columns: Timestamp + Label (CIC 2017/2018 header aliases
+    are bound in cic_schema.py). Full-day files can take a minute
+    because every row is binned; that is windowing, not training.
+
+    POST /api/world-model/upload
+      → load_cic_csv
+      → build_state_windows (5s, stride 5s)
+      → last_consecutive_history (8 windows, adjacent gaps ≤ 15s)
+      → scaler.transform
+      → explain_forecast (LSTM rollout + saliency + stage decode)
+
+2.3 Button: UPLOAD CSV
+    Same as drop. Use e.g.
+      data/raw/CIC-IDS2018/Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv
+    for held-out infiltration (the day used in the K-step report).
+
+2.4 Button: RUN SYNTHETIC SAMPLE
+    POST /api/world-model/sample
+    Builds a small CIC-shaped CSV in memory (benign → SSH brute →
+    infiltration-like ports), then runs THE SAME infer_from_csv path.
+    It is live LSTM, not saved JSON. The screenshots are this sample:
+      source_file = synthetic_demo.csv
+      n_windows   = 23
+      t_now       = 2018-02-28T10:01:50+00:00
+      stage       = benign
+      P           = 0.000
+
+    Why benign? The last 8 windows of that synthetic file are a quiet
+    3-flow / 3-port pattern. The attack head is below 0.15. That is a
+    CORRECT live answer, not a wiring failure. Upload 01 Mar to see
+    lateral_movement / T1021 when the frozen model agrees.
+
+
+--------------------------------------------------------------------------------
+3. TOP ROW — THE THREE SIH ANSWERS
+--------------------------------------------------------------------------------
+The problem asks the system to “forecast future network states and
+estimate the probability of attacker progression” and “map predicted
+behaviour to recognised attack stages (e.g. MITRE ATT&CK).”
+
+These three cards are that sentence.
+
+3.1 ATTACK IN 30s
+    Big number: 0.0%
+    Bar: P / 0.15, cyan when below threshold, red when alert.
+    Footer: “P=0.000 · threshold 0.15 · below threshold”
+
+    What it is mathematically:
+      The LSTM has two heads.
+      Head B emits a logit for “any attack in the next K=6 windows.”
+      P = sigmoid(logit) on the CURRENT 8-step history (not on Ŝ).
+      something_bad = (P ≥ 0.15)
+
+    What it is NOT:
+      Not a per-flow IDS label.
+      Not the old SOC “CRITICAL THREATS: 7” mock counter.
+
+3.2 MITRE STAGE
+    Screenshot: “Benign” (no technique id, because benign has none)
+    Subtext: synthetic_demo.csv · 23 windows · last 8 fed to LSTM
+
+    What it is:
+      After closed-loop rollout, Ŝ_{t+6} (the state 30s ahead) is
+      decoded by a multinomial Logistic Regression trained ONLY on
+      train-day scaled windows:
+        benign, reconnaissance, initial_access, lateral_movement,
+        command_and_control, exfiltration (reserved), impact (DoS)
+
+      Representative techniques:
+        reconnaissance     T1046  Network Service Discovery
+        initial_access     T1110  Brute Force
+        lateral_movement   T1021  Remote Services
+        command_and_control T1071 Application Layer Protocol
+        exfiltration       T1048  (reserved — CIC has no exfil label)
+        impact             T1498  Network Denial of Service
+
+    Decoder honesty: command_and_control was held out of train (02 Mar
+    bot). The decoder cannot invent C2 if it never saw it. Quote that.
+
+3.3 NOW (S_t)
+    Timestamp of the LAST observed 5s bin, here
+      2018-02-28T10:01:50+00:00
+    Footer: source=sample · seq 8×32 · horizon 30s
+
+    S_t is the 32-d feature VECTOR at time t. That is Section 2 of the
+    problem: “structured state vector at time t.” The 8×32 block ending
+    at S_t is the LSTM input x = [S_{t-7}, …, S_t].
+
+
+--------------------------------------------------------------------------------
+4. WHY BOX (NATURAL LANGUAGE)
+--------------------------------------------------------------------------------
+Screenshot text:
+
+  “No attack alert (probability 0.00 < 0.15). What is likely: benign.
+   Why: the attack head is driven most by down_up_ratio_mean; the stage
+   decode leans on psh_flag_sum; the 30s forecast changes pkt_len_mean
+   most.”
+
+This is _narrate() in explain.py. Three SIH questions in one paragraph:
+
+  Something bad?   binary head vs 0.15
+  What?            MITRE stage of Ŝ_{t+6}
+  Why?             top feature of each explainer (next section)
+
+It is NOT Transformer attention and NOT the SHAP library. It is
+gradient saliency + linear LogReg attribution + forecast delta.
+The problem allows “attention mechanisms, feature attribution or
+equivalent techniques.” This is the equivalent.
+
+
+--------------------------------------------------------------------------------
+5. STATE GRAPH (NEW — one SIH task, in order, musts unchanged)
+--------------------------------------------------------------------------------
+Problem statement first requirement:
+
+  “Represent network state using feature vectors or graphs.”
+
+Feature vectors were already on the page (32-d grid + 8×32 table).
+The first incomplete visual was the GRAPH of state transitions.
+
+Panel title: “State graph · observed S → predicted Ŝ”
+
+What you see:
+  A chain of nodes
+
+    t-7 → t-6 → t-5 → t-4 → t-3 → t-2 → t-1 → t
+                                              └ dashed → t+5s → … → t+30s
+
+  Solid cyan edges  = observed 5-second transitions (real CSV windows)
+  Dashed orange edges = LSTM closed-loop imaginary future
+  Observed node size  = ||S||_2  (energy of the 32-d vector)
+  Forecast node size  = P(attack) relative to threshold 0.15
+  Forecast node colour = MITRE stage
+                         benign=green, recon=cyan, initial_access=yellow,
+                         lateral_movement=orange, C2/impact=red
+
+This is a visual of P(S_{t+1} | history), not a GNN world model.
+Transformer / GNN as the DYNAMICS model stays unchecked on purpose
+(LSTM is the frozen world model; must not replace it).
+
+Code: ForecastDashboard.jsx  component StateTransitionGraph
+Data: bundle.history_states + bundle.timeline
+No change to model.py, world_lstm.pt, 32-d layout, or 0.15.
+
+
+--------------------------------------------------------------------------------
+6. 30s TIMELINE (CLOSED-LOOP Ŝ)
+--------------------------------------------------------------------------------
+Screenshot: six rows, all “benign”, P=0.000
+
+    t+5s    benign    P=0.000
+    t+10s   benign    P=0.000
+    t+15s   benign    P=0.000
+    t+20s   benign    P=0.000
+    t+25s   benign    P=0.000
+    t+30s   benign    P=0.000
+
+How it is built (the actual world-model use):
+
+  Ŝ_{t+1} = HeadA(LSTM([S_{t-7}, …, S_t]))
+  x ← [S_{t-6}, …, S_t, Ŝ_{t+1}]
+  repeat until k=6
+
+Each Ŝ_{t+k} is:
+  - decoded to a MITRE stage (LogReg)
+  - paired with the per-step attack probability from Head B during rollout
+  - stamped t_now + 5k seconds
+
+This is “forward simulation K steps” and “probability of attacker
+progression” from the problem statement. Persistence baseline
+(Ŝ = copy S_t) is what we beat on 01 Mar; the dashboard shows the
+LSTM rollout, not persist.
+
+
+--------------------------------------------------------------------------------
+7. THREE “WHY” COLUMNS (FEATURE ATTRIBUTION)
+--------------------------------------------------------------------------------
+Each list is top-5 features with a signed score and ▲ / ▼.
+
+7.1 Why · attack head
+    Screenshot (synthetic sample):
+      down_up_ratio_mean   ▲ 0.047
+      bytes_fwd_sum        ▲ 0.032
+      init_bwd_win_mean    ▲ 0.031
+      (plus two more)
+
+    Formula: mean |∂ attack_logit / ∂ x| over the 8 history steps.
+    High score = that coordinate of the 32-d vector most moves the
+    “something bad in 30s” logit. Direction comes from the signed
+    gradient (▲ up, ▼ down).
+
+7.2 Why · MITRE stage
+    Screenshot:
+      psh_flag_sum         ▲ 1.368
+      pkt_len_max          ▲ 1.170
+      dest_port_entropy    ▲ 0.969
+
+    Formula: LogReg coef[stage] × Ŝ_{t+6}   (linear contribution).
+    Answers: “which features of the *predicted* state made the decoder
+    say this MITRE stage?”
+
+7.3 Why · 30s change
+    Screenshot:
+      pkt_len_mean         ▼ 6.273
+      duration_max         ▼ 1.623
+      tcp_ratio            ▲ 1.354
+
+    Formula: Ŝ_{t+6} − S_t   (what the forecast thinks will MOVE).
+    This is dynamics explainability, not classification explainability.
+    On the sample, the model expects packet length / duration to drop
+    and tcp_ratio to rise a little — small benign drift.
+
+These three columns together are the SIH explainability requirement
+without adding a SHAP package or LSTM attention weights (those remain
+unchecked; must not change the frozen architecture to insert attention).
+
+
+--------------------------------------------------------------------------------
+8. S_t · 32-d STATE GRID  (FEATURE VECTOR)
+--------------------------------------------------------------------------------
+Title: “S_t · 32-d state (last 5s window, unscaled)”
+
+This is the problem’s “represent network state using feature vectors.”
+One cell per coordinate of S_t. Highlighted cells are features that
+appeared in any Why list.
+
+UNSCALED = raw window aggregates, human-readable.
+The LSTM itself sees z-scored values (train scaler). Both exist in the
+API JSON (s_t vs history_states_scaled).
+
+Screenshot values (synthetic last window) and what they mean:
+
+  FLOW-LEVEL (indices 0–21) — NetFlow / IPFIX-style
+  -------------------------------------------------
+  flow_count            3.000     flows that landed in this 5s bin
+  unique_dst_ports      3.000     distinct destination ports
+  dest_port_entropy     1.585     Shannon entropy of dst ports
+                                  (≈ log2(3) — three equal ports)
+  tcp_ratio             1.000     fraction of flows that are TCP
+  udp_ratio             0.000     fraction UDP
+  bytes_fwd_sum         3.30e+3   forward bytes in the bin
+  bytes_bwd_sum         6.31e+3   backward bytes
+  bidirectional_ratio   0.657     bwd / (fwd+bwd) byte share
+  pkts_fwd_sum          12.000    forward packets
+  pkts_bwd_sum          21.000    backward packets
+  duration_mean         3.70e+4   mean CIC flow duration (µs-scale)
+  duration_max          5.80e+4   max duration in the bin
+  iat_mean              3.35e+3   mean inter-arrival
+  iat_std               469.667   IAT spread
+  iat_max               1.61e+4   max IAT
+  syn_flag_sum          3.000     SYN flags summed over flows
+  ack_flag_sum          3.000     ACK
+  fin_flag_sum          0.000     FIN
+  rst_flag_sum          0.000     RST
+  psh_flag_sum          3.000     PSH (push) — stage decoder likes this
+  urg_flag_sum          0.000     URG
+  down_up_ratio_mean    1.000     CIC Down/Up Ratio average
+                                  (top attack-head feature on this sample)
+
+  PACKET-LEVEL FROM CIC (indices 22–28)
+  -------------------------------------
+  pkt_len_mean          283.667   mean packet length
+  pkt_len_std           65.667
+  pkt_len_max           1.12e+3
+  init_fwd_win_mean     8.19e+3   initial TCP window forward
+  init_bwd_win_mean     8.19e+3   initial TCP window backward
+  fwd_psh_flags_sum     3.000     forward PSH flags
+  port_scan_score       0.000     sequential / spread dst-port signature
+                                  (0 = no scan pattern in this bin)
+
+  PCAP STUBS IN S_t (indices 29–31) — remain 0 on CIC ML CSVs
+  -----------------------------------------------------------
+  ttl_variance          0.000     TTL²  (sidecar if a PCAP is attached)
+  ip_fragment_flags     0.000     packets (MF or frag offset > 0)
+  retransmit_count      0.000     packets (TCP payload seq repeats)
+
+  Optional PCAP upload shows the same three numbers in a sidecar panel.
+  They are NOT written into history_states (frozen scaler/LSTM).
+
+  Src IP / Dst IP / Src Port are also omitted from CIC ML CSVs and
+  are NOT extra dimensions (that would break the frozen 32-d LSTM).
+
+
+--------------------------------------------------------------------------------
+9. HISTORY TABLE  (8 × 32 FED TO THE LSTM)
+--------------------------------------------------------------------------------
+Title: “History fed to LSTM (8 × 32, unscaled)”
+
+Rows: t-7, t-6, …, t-1, t
+  t is highlighted (cyan). It MUST match the 32-d grid above.
+
+Columns: the same 32 feature names, in STATE_FEATURE_ORDER.
+
+This is the tensor x ∈ R^{8×32} after windowing, BEFORE the train
+scaler. The LSTM sees scaler.transform(x).
+
+On the sample, flow_count is 3.00 on most rows and 5.00 on t-6 / t-5 —
+the synthetic generator briefly emitted more flows, then settled.
+That is temporal structure, which a single-row classifier would miss
+and the LSTM is trained to use.
+
+seq_len=8 was chosen so 40s of past (8×5s) predicts 30s of future
+(6×5s). Do not change seq_len without retraining (must).
+
+
+--------------------------------------------------------------------------------
+10. WHAT WAS REMOVED (AND WHY THE OLD SCREEN LOOKED “LIVE”)
+--------------------------------------------------------------------------------
+The previous UI was UnifiedDashboard.jsx: map, incident feed, event
+log, “CONNECTION OFFLINE — RECONNECTING IN 3s”, mock :8000 Redis SOC.
+
+That skin is NOT the SIH scientific claim. It mixed:
+  - mock incidents when the old SOC API was down
+  - saved 01 Mar explanation JSON in a small World Model panel
+  - a second process fighting for :8001
+
+The live page has none of those. Old component files may still exist
+on disk; they are not mounted.
+
+
+--------------------------------------------------------------------------------
+11. SIH PROBLEM STATEMENT — COMPONENT MAP
+--------------------------------------------------------------------------------
+Required capability                         Where it lives on this screen
+-----------------------------------------  --------------------------------
+Represent state as feature vectors         32-d S_t grid + 8×32 table
+Represent state as graphs                  State graph panel (new)
+Learn P(S_{t+1}|history) with LSTM         Frozen 2×64 LSTM, seq_len 8
+Forecast future network states             30s timeline Ŝ_{t+1}..Ŝ_{t+6}
+P(attacker progression)                    Attack-in-30s card + per-step P
+Map to MITRE ATT&CK stages                 MITRE stage card + timeline
+Explainability (attribution / equivalent)  Why paragraph + 3 why columns
+Offline prototype, CSV in                  Upload / synthetic sample
+Open source, no cloud                      FastAPI :8001 + React :3000
+
+
+--------------------------------------------------------------------------------
+12. CHECKLIST vs PROBLEM STATEMENT (UNCHANGED MUSTS MARKED)
+--------------------------------------------------------------------------------
+Background / objectives
+  [x] Learn evolving network state from telemetry
+  [x] Anticipate attacker progression (30s closed-loop)
+  [x] Interpretable defender output (stage + why)
+  [x] Software prototype, open-source, offline
+  [~] Enterprise / CII applicability — same CICFlowMeter-style features
+      an enterprise sensor can emit; no live tap in this demo
+
+Section 1 — two levels of features
+  [x] Flow-level NetFlow-style aggregates          (S_t indices 0–21)
+  [x] Packet-level CICFlowMeter + port-scan        (indices 22–28)
+  [~] TTL variance, IP fragment flags, retransmit  (Scapy sidecar;
+                                                    frozen S_t 29–31 still 0)
+  [ ] Src/Dst IP in the state vector               (not in CIC ML CSV;
+                                                    adding them would CHANGE
+                                                    input_dim=32 — MUST NOT)
+
+Section 2 — world model architecture
+  [x] Structured 32-d state vector at time t
+  [x] Sequence LSTM learns P(S_{t+1} | S_{t-7:t})
+  [x] Supervised transitions from the capture timeline
+  [x] Held-out days (01 Mar infiltration) to test generalisation
+  [x] Visual state GRAPH of observed S and predicted Ŝ  (this increment)
+  [ ] Transformer / GNN as the dynamics model
+      (MUST NOT — LSTM is the frozen world model)
+
+Section 3 — infiltration prediction + ATT&CK
+  [x] Time-series P(attack) over K=6 (and per-step on upload)
+  [x] MITRE stages: recon, initial access, lateral movement, C2,
+      exfiltration (reserved), plus impact for DoS/DDoS
+  [x] Driving features (saliency + linear attribution + forecast deltas)
+  [ ] Built-in LSTM attention weights / SHAP package
+      (MUST NOT change architecture to insert attention)
+
+Expected solution (indicative)
+  [x] Feature pipeline: CIC-IDS2018 CSV → timestamped 32-d matrix
+  [x] Trained WM + weights + train script + config in repo
+  [x] K-step engine: P(infiltration), MITRE stage, top features
+  [x] Explainability per prediction
+  [x] Offline UI: CSV upload — React, not Streamlit
+  [x] Benchmark vs LogReg (F1, precision, recall, FPR) + persist MSE
+      (quoted in SIH_World_Model_Overall_Report.txt; not this UI)
+  [x] PCAP ingest via Scapy (optional upload sidecar, not LSTM input)
+  [ ] Demo video / 5-slide deck / GitHub link  (process deliverables)
+
+ONE TASK DONE IN ORDER, WITHOUT CHANGING MUSTS
+----------------------------------------------
+First SIH bullet that was only half-done: “feature vectors OR graphs.”
+Vectors existed. Graphs did not.
+
+Implemented: state-transition graph on the live dashboard.
+Did NOT: retrain, edit model.py, widen S_t, fill PCAP stubs, add GNN
+as the world model, or start a second :8001 process.
+
+
+--------------------------------------------------------------------------------
+13. RESULTS TO KEEP QUOTING (FROM THE OVERALL REPORT)
+--------------------------------------------------------------------------------
+Do not quote the dashboard’s synthetic P=0.000 as a model-quality
+number. Quote the held-out 01 Mar experiment:
+
+  Dynamics, test 01 Mar infiltration
+      LSTM MSE 0.647   persist 1.105    (~41% lower through 30s)
+
+  Attack-within-K, test 01 Mar
+      LSTM  F1 0.602  FPR 0.117
+      LogReg F1 0.445  FPR 0.914
+
+  MITRE decode of rolled Ŝ, test 01 Mar
+      LSTM acc 0.800 vs persist 0.712
+      lateral_movement F1 0.698 vs 0.584
+
+The live UI is how a defender SEES a new CSV go through that same
+frozen engine.
+
+
+--------------------------------------------------------------------------------
+14. HOW TO RUN (OFFLINE)
+--------------------------------------------------------------------------------
+From Normnative-/:
+
+  python -m src.world_model.api          # ONE process, :8001
+  cd frontend && npm run dev             # :3000, proxies /api → :8001
+
+Open http://localhost:3000/
+  UPLOAD CSV  or  RUN SYNTHETIC SAMPLE
+
+If :8001 is already in use, do not start another copy. Health check:
+
+  GET http://127.0.0.1:8001/health
+  → {"ok": true, "service": "world-model"}
+
+
+--------------------------------------------------------------------------------
+15. CODE MAP
+--------------------------------------------------------------------------------
+  frontend/src/pages/ForecastDashboard.jsx     this entire UI
+  frontend/src/App.jsx                         mounts ForecastDashboard only
+  src/world_model/api.py                       upload + sample + status
+  src/world_model/service.py                   CSV → windows → LSTM
+  src/world_model/windows.py                   5s 32-d S_t
+  src/world_model/cic_schema.py                32 feature names
+  src/world_model/model.py                     LSTM 2×64  (do not change)
+  src/world_model/rollout.py                   closed-loop K=6
+  src/world_model/explain.py                   why-attack / why-stage / why-change
+  src/world_model/mitre_decode.py              train-only stage LogReg
+  src/world_model/models/world_lstm.pt         frozen weights
+  src/world_model/models/scaler.npz            frozen train scaler
+
+Sibling lab notebooks in this folder:
+  SIH_World_Model_Overall_Report.txt
+  LSTM_World_Model_Training_Report.txt
+  LSTM_World_Model_KStep_Report.txt
+  LSTM_World_Model_MITRE_Report.txt
+  LSTM_World_Model_Explain_Report.txt
+  LSTM_World_Model_Dashboard_Report.txt   (old SOC wiring; superseded
+                                           by this live CSV UI)
+
+
+================================================================================
+End of live dashboard component report
+================================================================================

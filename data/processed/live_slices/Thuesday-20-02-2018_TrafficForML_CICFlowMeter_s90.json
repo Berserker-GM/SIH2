@@ -1,0 +1,10 @@
+{
+  "file_bytes": 209249758,
+  "truncated": true,
+  "slice_seconds": 90.0,
+  "note": "densest 90s attack window (2540 attack flows)",
+  "n_rows": 6450,
+  "t0": "2018-02-28T11:11:30+00:00",
+  "t1": "2018-02-28T11:13:00+00:00",
+  "cached": false
+}

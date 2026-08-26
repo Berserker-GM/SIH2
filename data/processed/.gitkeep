@@ -1,0 +1,2 @@
+# Windowed S_t arrays written by:
+#   python -m src.world_model.prepare_dataset --csv data/raw/<file>.csv

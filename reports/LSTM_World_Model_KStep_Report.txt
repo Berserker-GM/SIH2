@@ -1,0 +1,210 @@
+================================================================================
+LSTM WORLD MODEL — K-STEP ROLLOUT REPORT
+Smart India Hackathon | Predictive Cybersecurity World Model
+Project: Normnative (Normative)
+Date: 25 August 2026
+================================================================================
+
+1. PURPOSE
+----------
+The previous training step learned one-step dynamics:
+
+    P(S_(t+1) | S_t, ..., S_(t-L+1))
+
+and a binary head P(attack in the next K=6 windows) (~30 seconds).
+
+That binary head is NOT a K-step forecast. It does not simulate future
+states. This step evaluates the actual world-model claim:
+
+    Closed-loop rollout:  S_t → Ŝ_(t+1) → Ŝ_(t+2) → ... → Ŝ_(t+K)
+
+K = 6 windows at Δt = 5 s  ⇒  30-second trajectory.
+
+The LSTM weights were NOT updated. Architecture was NOT changed.
+The saved checkpoint from multi-day training was reused.
+
+
+2. WHAT WAS EVALUATED
+---------------------
+Closed-loop (teacher-free):
+  history x = [S_(t-7), ..., S_t]          length L = 8, dim = 32
+  Ŝ_(t+1) = next_state_head(LSTM(x))
+  x ← [S_(t-6), ..., S_t, Ŝ_(t+1)]
+  repeat until Ŝ_(t+K)
+
+Persist-rollout baseline (required SIH comparison):
+  Ŝ_(t+k) = S_t  for all k = 1..6
+
+A K-step window is kept only if:
+  - all history + future pairs share the same day_id
+  - timestamps are strictly increasing
+  - adjacent deltas ≤ 15 s (same rule as 1-step pair generation)
+  Sequences must not cross a day boundary or a large gap.
+
+
+3. DATA AND SPLIT (UNCHANGED)
+-----------------------------
+NPZ:     data/processed/state_windows_multiday.npz
+         47,883 pairs, 32-d, 9 CIC-IDS2018 days
+
+Checkpoint: src/world_model/models/world_lstm.pt
+Scaler:     src/world_model/models/scaler.npz   (train-only, reused)
+
+Day split (same as training; no 70/15/15):
+  TRAIN  2018-02-14 brute | 15 DoS | 16 DoS | 22 web | 28 infiltration
+  VAL    2018-02-23 web
+  TEST   2018-02-21 DDoS HOIC/LOIC-UDP | 2018-03-01 infiltration | 2018-03-02 bot
+
+K-step windows actually scored (subset that also has 6 valid future bins):
+  VAL    kept=6,643   rejected_day=0    rejected_gap=12   rejected_order=0
+  TEST   kept=13,618  rejected_day=24   rejected_gap=222  rejected_order=0
+         2018-02-21 n=632
+         2018-03-01 n=6,726
+         2018-03-02 n=6,260
+
+Command:
+  python -m src.world_model.eval_kstep --npz data/processed/state_windows_multiday.npz
+
+JSON: src/world_model/models/kstep_metrics.json
+
+
+4. MODEL (UNCHANGED)
+--------------------
+Input          (batch, 8, 32)
+LSTM           2 layers, hidden 64, dropout 0.2
+Next-state     64 → 64 → 32
+Attack head    64 → 32 → 1     (not used for this MSE table)
+
+Device: CPU. No gradient updates.
+
+
+5. RESULTS
+----------
+ΔMSE > 0 means LSTM beats persist (reduction = (persist − LSTM) / persist).
+
+5.1 Validation — Friday 23 Feb 2018 (web attacks, seen family, new day)
+  n = 6,643
+
+       k     LSTM MSE    Persist MSE    LSTM MAE    Persist MAE    ΔMSE
+       1       0.4630         0.7167      0.3281         0.3500    0.354
+       2       0.5047         0.8310      0.3561         0.4117    0.393
+       3       0.5190         0.8748      0.3630         0.4336    0.407
+       4       0.5112         0.9125      0.3653         0.4455    0.440
+       5       0.5145         0.9055      0.3666         0.4517    0.432
+       6       0.5193         0.9141      0.3674         0.4526    0.432
+     all       0.5053         0.8591      0.3578         0.4242    0.412
+
+  LSTM wins at every horizon. Error grows slowly; persist grows faster.
+  k=1 matches the earlier one-step val MSE (~0.46 vs persist ~0.72).
+
+
+5.2 Test — Thursday 01 Mar 2018 (infiltration, same class as 28 Feb, new day)
+  n = 6,726
+
+       k     LSTM MSE    Persist MSE    ΔMSE
+       1       0.6159         0.9839    0.374
+       2       0.6385         1.1180    0.429
+       3       0.6448         1.1114    0.420
+       4       0.6505         1.1045    0.411
+       5       0.6559         1.1365    0.423
+       6       0.6767         1.1768    0.425
+     all       0.6471         1.1052    0.415
+
+  This is the SIH world-model result: closed-loop 30 s forecasts beat
+  copying S_t on a held-out infiltration day.
+
+
+5.3 Test — Friday 02 Mar 2018 (bot / C2 — unseen MITRE stage in train)
+  n = 6,260
+
+       k     LSTM MSE    Persist MSE    ΔMSE
+       1       0.4750         0.4213   -0.127
+       2       0.5119         0.4934   -0.037
+       3       0.5353         0.5261   -0.018
+       4       0.5590         0.5914    0.055
+       5       0.5790         0.5989    0.033
+       6       0.6009         0.6453    0.069
+     all       0.5435         0.5461    0.005
+
+  Essentially tied. LSTM is slightly worse at k=1, slightly better by k=6.
+
+
+5.4 Test — Wednesday 21 Feb 2018 (DDoS HOIC / LOIC-UDP)
+  n = 632
+
+       k     LSTM MSE    Persist MSE    ΔMSE
+       1     935.115        189.663    -3.930
+       2     930.197        400.553    -1.322
+       3     923.884        560.938    -0.647
+       4     919.696        648.200    -0.419
+       5     921.682        706.028    -0.305
+       6     928.766        814.819    -0.140
+     all     926.557        553.367    -0.674
+
+  Same scale shift diagnosed after 1-step training:
+    pkts_fwd_sum z ≈ 489 on HOIC windows vs train std of that feature.
+    LSTM predictions stay |z| ≲ 5 (in-distribution).
+    Persist also degrades as K grows because the flood is not constant S_t.
+
+  Do NOT treat this day as a parser bug. Schema, aliases, timestamps,
+  NaNs, and sequence filters are clean.
+
+
+5.5 Pooled test (do not quote without the per-day split)
+  n = 13,618
+  LSTM overall MSE 43.57   Persist 26.48
+
+  This pool is ~99% 21 Feb. Honest SIH wording uses 01 Mar (and val),
+  not the pooled test MSE.
+
+
+6. INTERPRETATION
+-----------------
+What the K-step step proved
+  - The saved next-state head can be unrolled for 30 seconds without
+    becoming unstable on web and infiltration traffic.
+  - On 23 Feb val and 01 Mar test, closed-loop MSE is ~40% below persist
+    at every k, including k=6.
+  - Day-boundary / gap filters still hold for multi-step futures
+    (0 order errors; 24 day-boundary rejects on test).
+
+What it did not prove
+  - It is not a volumetric-DDoS trajectory model. 21 Feb HOIC is outside
+    the train scaler; rollout cannot invent z=489 from z≈0 predictions.
+  - The attack head was not used here. Binary attack-within-K is still
+    a separate 1-shot classifier, not a simulated MITRE chain.
+
+Honest SIH wording:
+  The world model forecasts network state 30 seconds ahead better than
+  persistence on held-out web and infiltration days. K-step MSE on
+  unseen HOIC is dominated by count-feature scale shift, not by
+  exploding rollouts.
+
+
+7. CODE MAP
+-----------
+  src/world_model/rollout.py         collect_kstep_windows, closed-loop,
+                                     persist_rollout, compare_kstep
+  src/world_model/eval_kstep.py      CLI: load ckpt + scaler, no training
+  tests/test_world_model_rollout.py  20 checks (CopyLast==persist, day/gap,
+                                     8×32 history, 6×32 future, 2×64 LSTM)
+
+Reproduce:
+  cd Normnative-
+  python tests/test_world_model_rollout.py
+  python -m src.world_model.eval_kstep --npz data/processed/state_windows_multiday.npz
+
+
+8. NEXT STEP AFTER THIS REPORT
+------------------------------
+Map predicted future state Ŝ_(t+k) to SIH MITRE ATT&CK stages
+(benign / reconnaissance / initial_access / lateral_movement /
+command_and_control / exfiltration / impact), without changing the
+LSTM. Decode the rolled-out 32-d vector; compare to true window
+stage_id and to decoding persist(S_t).
+
+Do not retrain the LSTM for that step.
+
+================================================================================
+End of K-step report
+================================================================================
