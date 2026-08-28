@@ -12,7 +12,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from src.world_model.dataset import canonical_day_id
+from src.world_model.dataset import DAY_ID_DTYPE, canonical_day_id
 from src.world_model.metrics import next_state_metrics
 
 DEFAULT_K = 6
@@ -139,13 +139,13 @@ def collect_kstep_windows(
     if n_kept == 0:
         x = np.zeros((0, seq_len, dim), dtype=np.float32)
         y = np.zeros((0, k, dim), dtype=np.float32)
-        day_arr = np.array([], dtype="U10")
+        day_arr = np.array([], dtype=DAY_ID_DTYPE)
         ts_arr = np.zeros((0,), dtype=np.float64)
         stage_arr = np.zeros((0, k), dtype=np.int32)
     else:
         x = np.stack(xs).astype(np.float32)
         y = np.stack(ys).astype(np.float32)
-        day_arr = np.array(out_days, dtype="U10")
+        day_arr = np.array(out_days, dtype=DAY_ID_DTYPE)
         ts_arr = np.array(out_ts, dtype=np.float64)
         stage_arr = np.stack(out_stage).astype(np.int32) if out_stage else np.zeros((0, k), dtype=np.int32)
 

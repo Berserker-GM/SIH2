@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, recall_score
 
 from src.world_model.labels import STAGE_NAMES, technique_for_stage
 
@@ -73,11 +73,13 @@ def stage_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     y_pred = np.asarray(y_pred).astype(int).ravel()
     labels = list(range(N_STAGES))
     per = f1_score(y_true, y_pred, labels=labels, average=None, zero_division=0)
+    rec = recall_score(y_true, y_pred, labels=labels, average=None, zero_division=0)
     per_stage = {}
     for i, name in enumerate(STAGE_NAMES):
         tid, tname = technique_for_stage(name)
         per_stage[name] = {
             "f1": float(per[i]),
+            "recall": float(rec[i]),
             "support": int((y_true == i).sum()),
             "pred_count": int((y_pred == i).sum()),
             "technique_id": tid,

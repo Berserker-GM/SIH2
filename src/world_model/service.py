@@ -1,6 +1,12 @@
 """Frozen world-model runtime for the dashboard API.
 
 Does not train. Does not require Redis.
+
+In-process scoring for adaptive personas (no HTTP):
+
+    from src.world_model.service import score_history
+    score_history(x)   # x: (8, 32) unscaled, most recent last; model_version "v1"|"v2"
+
 """
 
 from __future__ import annotations
@@ -33,8 +39,13 @@ DEFAULT_EXAMPLES = ROOT / "src" / "world_model" / "models" / "explain_examples.j
 DEFAULT_CKPT = ROOT / "src" / "world_model" / "models" / "world_lstm.pt"
 DEFAULT_SCALER = ROOT / "src" / "world_model" / "models" / "scaler.npz"
 DEFAULT_NPZ = ROOT / "data" / "processed" / "state_windows_multiday.npz"
+DEFAULT_CKPT_V2 = ROOT / "src" / "world_model" / "models" / "world_lstm_v2.pt"
+DEFAULT_SCALER_V2 = ROOT / "src" / "world_model" / "models" / "scaler_v2.npz"
+DEFAULT_DECODER_V2 = ROOT / "src" / "world_model" / "models" / "stage_decoder_v2.joblib"
+DEFAULT_NPZ_V2 = ROOT / "data" / "processed" / "state_windows_combined.npz"
 MAX_GAP_SECONDS = 15.0
 MAX_UPLOAD_BYTES = 80 * 1024 * 1024
+OOD_ZMAX_THRESHOLD = 6.0
 
 LOCAL_CIC_ALIASES: dict[str, tuple[str, ...]] = {
     "ddos-loic-http": (
@@ -128,6 +139,8 @@ def list_local_csv() -> list[dict[str, Any]]:
         seen.add(rp)
         rel = str(rp.relative_to(raw)).replace("\\", "/")
         top = rel.split("/", 1)[0]
+        if top == "personas":
+            continue
         out.append({
             "name": rp.name,
             "rel": rel,
@@ -363,3 +376,116 @@ class WorldModelRuntime:
             )
             out["pcap_stats"] = pcap_stats
         return jsonable(out)
+
+
+_VERSIONED_RUNTIME: dict[str, WorldModelRuntime] = {}
+
+
+def ood_zmax(state: np.ndarray, scaler: Scaler) -> float:
+    """Max |z-score| of one unscaled 32-d window vs the train scaler."""
+    row = np.asarray(state, dtype=np.float64).reshape(-1)
+    z = (row - scaler.mean) / scaler.std
+    return float(np.max(np.abs(z)))
+
+
+def _fit_decoder_from_npz(npz_path: Path, scaler: Scaler):
+    data = load_npz(npz_path)
+    train_i, _, _ = day_split(
+        data["day_id"], DEFAULT_TRAIN_DAYS, DEFAULT_VAL_DAYS, DEFAULT_TEST_DAYS,
+    )
+    from src.world_model.dataset import split_synthetic_days
+    syn_tr, syn_va, syn_te = split_synthetic_days(data["day_id"])
+    if syn_tr or syn_va or syn_te:
+        train_days = list(DEFAULT_TRAIN_DAYS) + syn_tr
+        val_days = list(DEFAULT_VAL_DAYS) + syn_va
+        test_days = list(DEFAULT_TEST_DAYS) + syn_te
+        train_i, _, _ = day_split(data["day_id"], train_days, val_days, test_days)
+    return fit_stage_decoder(
+        scaler.transform(data["states"][train_i]).astype(np.float32),
+        data["stage_id"][train_i],
+    )
+
+
+def load_versioned_runtime(model_version: str = "v1") -> WorldModelRuntime:
+    """Load v1 (CIC-only, frozen quoted run) or v2 (CIC+persona) weights."""
+    key = str(model_version).strip().casefold()
+    if key in _VERSIONED_RUNTIME:
+        return _VERSIONED_RUNTIME[key]
+    if key in {"v1", "1", ""}:
+        rt = load_frozen_runtime()
+        _VERSIONED_RUNTIME["v1"] = rt
+        return rt
+    if key not in {"v2", "2"}:
+        raise ValueError(f"model_version must be 'v1' or 'v2', got {model_version!r}")
+
+    from src.world_model.eval_kstep import _load_model
+    from src.world_model.mitre_decode import StageDecoder
+    import joblib
+
+    if not DEFAULT_CKPT_V2.is_file() or not DEFAULT_SCALER_V2.is_file():
+        raise FileNotFoundError(
+            "v2 artifacts not found. Train with: "
+            "python -m src.world_model.train --npz data/processed/state_windows_combined.npz --tag v2"
+        )
+    model, _ckpt = _load_model(DEFAULT_CKPT_V2)
+    scaler = Scaler.load(DEFAULT_SCALER_V2)
+    decoder = None
+    if DEFAULT_DECODER_V2.is_file():
+        decoder = StageDecoder(joblib.load(DEFAULT_DECODER_V2))
+    else:
+        npz = DEFAULT_NPZ_V2 if DEFAULT_NPZ_V2.is_file() else DEFAULT_NPZ
+        if npz.is_file():
+            decoder = _fit_decoder_from_npz(npz, scaler)
+    rt = WorldModelRuntime(model=model, scaler=scaler, decoder=decoder, examples=load_examples())
+    _VERSIONED_RUNTIME["v2"] = rt
+    return rt
+
+
+def score_history(x: np.ndarray, model_version: str = "v2") -> dict:
+    """In-process scoring for adaptive persona hill-climb. Not HTTP.
+
+    x: shape (8, 32), unscaled, columns in STATE_FEATURE_ORDER, most recent last.
+    model_version: "v1" (frozen CIC-only) or "v2" (CIC+persona augmented).
+
+    Returns:
+      {
+        "attack_probability": float,
+        "something_bad": bool,
+        "stage": str,
+        "technique_id": str | None,
+        "why_attack_top_features": [(feature_name, float), ...],
+        # extras (safe to ignore): ood_score, ood_flag, model_version, why_stage, why_change
+      }
+    """
+    rt = load_versioned_runtime(model_version)
+    if rt.model is None or rt.decoder is None or rt.scaler is None:
+        raise RuntimeError(
+            f"World-model {model_version} is not loaded (need LSTM + scaler + decoder)"
+        )
+    hist = np.asarray(x, dtype=np.float32)
+    if hist.shape != (rt.seq_len, rt.input_dim):
+        raise ValueError(
+            f"x must be ({rt.seq_len}, {rt.input_dim}) unscaled, got {hist.shape}"
+        )
+    scaled = rt.scaler.transform(hist).astype(np.float32)
+    bundle = rt.forecast(scaled)
+    why = bundle.get("why_attack") or []
+    top = [(str(row["name"]), float(row["score"])) for row in why]
+    tid = bundle.get("technique_id") or None
+    if tid == "":
+        tid = None
+    ood = ood_zmax(hist[-1], rt.scaler)
+    return {
+        "attack_probability": float(bundle["attack_probability"]),
+        "something_bad": bool(bundle["something_bad"]),
+        "stage": str(bundle["stage"]),
+        "technique_id": tid,
+        "why_attack_top_features": top,
+        "ood_score": ood,
+        "ood_flag": bool(ood >= OOD_ZMAX_THRESHOLD),
+        "ood_threshold": float(OOD_ZMAX_THRESHOLD),
+        "model_version": "v2" if str(model_version).strip().casefold() in {"v2", "2"} else "v1",
+        "why_stage": bundle.get("why_stage"),
+        "why_change": bundle.get("why_change"),
+        "narrative": bundle.get("narrative"),
+    }

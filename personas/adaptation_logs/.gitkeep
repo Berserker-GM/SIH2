@@ -1,0 +1,2 @@
+# Hill-climb cycle logs: <persona_id>/<run_id>.jsonl
+# Consumed by the persona generator, not by LSTM training.

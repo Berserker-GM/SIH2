@@ -29,6 +29,11 @@ _ISO_DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # CIC filenames: Wednesday-14-02-2018_TrafficForML_...
 _DMY = re.compile(r"(\d{2})-(\d{2})-(\d{4})")
 
+# syn:{persona_id}:{run_id}  — one synthetic run == one calendar "day"
+SYNTH_DAY_PREFIX = "syn:"
+DAY_ID_DTYPE = "U64"
+SOURCE_DTYPE = "U16"
+
 _STACK_KEYS = (
     "states",
     "next_states",
@@ -42,6 +47,9 @@ _STACK_KEYS = (
     "window_ids",
     "day_id",
     "source_file",
+    "source",
+    "persona_id",
+    "run_id",
 )
 
 
@@ -74,15 +82,85 @@ class SequenceStats:
 
 
 def canonical_day_id(token: str) -> str:
-    """Map a CIC filename, stem, or ISO date to YYYY-MM-DD."""
+    """Map a CIC filename, stem, ISO date, or synthetic run id to a split key.
+
+    Synthetic runs use `syn:{persona_id}:{run_id}` and are treated exactly like
+    one calendar day: sequences never cross a run boundary.
+    """
     text = str(token).strip()
+    if not text:
+        raise ValueError("empty day identifier")
     if _ISO_DAY.fullmatch(text):
         return text
+    if text.startswith(SYNTH_DAY_PREFIX):
+        return text
     m = _DMY.search(text.replace("_", "-"))
-    if not m:
-        raise ValueError(f"Cannot parse day identifier from {token!r}")
-    dd, mm, yyyy = m.group(1), m.group(2), m.group(3)
-    return f"{yyyy}-{mm}-{dd}"
+    if m:
+        dd, mm, yyyy = m.group(1), m.group(2), m.group(3)
+        return f"{yyyy}-{mm}-{dd}"
+    return text
+
+
+def make_synth_day_id(persona_id: str, run_id: str) -> str:
+    p = str(persona_id).strip()
+    r = str(run_id).strip()
+    if not p or not r:
+        raise ValueError("persona_id and run_id are required")
+    if ":" in p or "/" in p or "\\" in p:
+        raise ValueError(f"persona_id must not contain ':' or slashes: {p!r}")
+    if "/" in r or "\\" in r:
+        raise ValueError(f"run_id must not contain slashes: {r!r}")
+    return f"{SYNTH_DAY_PREFIX}{p}:{r}"
+
+
+def parse_synth_day_id(day_id: str) -> tuple[str, str] | None:
+    text = canonical_day_id(day_id)
+    if not text.startswith(SYNTH_DAY_PREFIX):
+        return None
+    rest = text[len(SYNTH_DAY_PREFIX):]
+    persona, sep, run = rest.partition(":")
+    if not sep or not persona or not run:
+        raise ValueError(f"malformed synthetic day_id: {day_id!r}")
+    return persona, run
+
+
+def is_synthetic_day(day_id: str) -> bool:
+    return str(day_id).startswith(SYNTH_DAY_PREFIX)
+
+
+def split_synthetic_days(day_ids: Sequence[str]) -> tuple[list[str], list[str], list[str]]:
+    """Assign each syn:{persona}:{run} to train/val/test. Never splits a run.
+
+    Per persona, sorted by run_id:
+      1 run  → train
+      2 runs → train, test
+      3+     → all but last two train, second-last val, last test
+    """
+    from collections import defaultdict
+
+    by_persona: dict[str, list[str]] = defaultdict(list)
+    unique = sorted({canonical_day_id(d) for d in day_ids if is_synthetic_day(d)})
+    for d in unique:
+        parsed = parse_synth_day_id(d)
+        if parsed is None:
+            continue
+        by_persona[parsed[0]].append(d)
+    train: list[str] = []
+    val: list[str] = []
+    test: list[str] = []
+    for persona in sorted(by_persona):
+        runs = sorted(by_persona[persona])
+        n = len(runs)
+        if n == 1:
+            train.extend(runs)
+        elif n == 2:
+            train.append(runs[0])
+            test.append(runs[1])
+        else:
+            train.extend(runs[:-2])
+            val.append(runs[-2])
+            test.append(runs[-1])
+    return train, val, test
 
 
 def fit_scaler(train_states: np.ndarray) -> Scaler:
@@ -167,7 +245,7 @@ def make_sequences(
         y_next = np.stack(ys).astype(np.float32)
         y_atk = np.asarray(yc, dtype=np.float32)
         stats = SequenceStats(n_kept=len(x))
-        seq_days = np.array(["unknown"] * len(x), dtype="U10")
+        seq_days = np.array(["unknown"] * len(x), dtype=DAY_ID_DTYPE)
         if return_stats:
             return x, y_next, y_atk, stats, seq_days
         return x, y_next, y_atk
@@ -176,9 +254,9 @@ def make_sequences(
     if len(ts) != len(states):
         raise ValueError("timestamps length must match states")
     if day_ids is None:
-        days = np.array(["unknown"] * len(states), dtype="U16")
+        days = np.array(["unknown"] * len(states), dtype=DAY_ID_DTYPE)
     else:
-        days = np.array([canonical_day_id(d) for d in day_ids])
+        days = np.array([canonical_day_id(d) for d in day_ids], dtype=DAY_ID_DTYPE)
 
     xs, ys, yc, seq_days = [], [], [], []
     stats = SequenceStats()
@@ -212,12 +290,12 @@ def make_sequences(
         x = np.zeros((0, seq_len, states.shape[1]), dtype=np.float32)
         y_next = np.zeros((0, states.shape[1]), dtype=np.float32)
         y_atk = np.zeros((0,), dtype=np.float32)
-        seq_day_arr = np.array([], dtype="U10")
+        seq_day_arr = np.array([], dtype=DAY_ID_DTYPE)
         return x, y_next, y_atk, stats, seq_day_arr
     x = np.stack(xs).astype(np.float32)
     y_next = np.stack(ys).astype(np.float32)
     y_atk = np.asarray(yc, dtype=np.float32)
-    seq_day_arr = np.array(seq_days, dtype="U10")
+    seq_day_arr = np.array(seq_days, dtype=DAY_ID_DTYPE)
     if return_stats:
         return x, y_next, y_atk, stats, seq_day_arr
     return x, y_next, y_atk
@@ -229,24 +307,43 @@ def _day_from_unix(ts: float) -> str:
 
 def load_npz(path: Path) -> dict:
     z = np.load(path, allow_pickle=True)
-    order = np.argsort(z["timestamps"])
-    ts = z["timestamps"][order]
+    names = set(z.files)
+    ts_raw = np.asarray(z["timestamps"], dtype=np.float64)
+    if "day_id" in names:
+        day_raw = np.array([canonical_day_id(d) for d in z["day_id"]], dtype=DAY_ID_DTYPE)
+    else:
+        day_raw = np.array([_day_from_unix(t) for t in ts_raw], dtype=DAY_ID_DTYPE)
+    # Sort by day then time so synthetic runs with overlapping clocks stay contiguous.
+    order = np.lexsort((ts_raw, day_raw))
+    ts = ts_raw[order]
     out = {
         "states": z["states"][order].astype(np.float32),
         "next_states": z["next_states"][order].astype(np.float32),
         "attack_within_k": z["attack_within_k"][order].astype(np.float32),
         "timestamps": ts,
         "feature_names": z["feature_names"],
+        "day_id": day_raw[order],
     }
-    names = set(z.files)
-    if "day_id" in names:
-        out["day_id"] = np.array([canonical_day_id(d) for d in z["day_id"][order]])
-    else:
-        out["day_id"] = np.array([_day_from_unix(t) for t in ts], dtype="U10")
+    n = len(ts)
     if "source_file" in names:
         out["source_file"] = np.asarray(z["source_file"][order], dtype=object)
     else:
-        out["source_file"] = np.array(["unknown"] * len(ts), dtype=object)
+        out["source_file"] = np.array(["unknown"] * n, dtype=object)
+    if "source" in names:
+        out["source"] = np.asarray(z["source"][order], dtype=SOURCE_DTYPE)
+    else:
+        out["source"] = np.array(
+            ["synthetic" if is_synthetic_day(d) else "real" for d in out["day_id"]],
+            dtype=SOURCE_DTYPE,
+        )
+    if "persona_id" in names:
+        out["persona_id"] = np.asarray(z["persona_id"][order], dtype=DAY_ID_DTYPE)
+    else:
+        out["persona_id"] = np.array([""] * n, dtype=DAY_ID_DTYPE)
+    if "run_id" in names:
+        out["run_id"] = np.asarray(z["run_id"][order], dtype=DAY_ID_DTYPE)
+    else:
+        out["run_id"] = np.array([""] * n, dtype=DAY_ID_DTYPE)
     for key in ("attack_now", "window_ids", "infiltration_within_k", "pre_attack", "stage_id", "technique_id"):
         if key in names:
             out[key] = z[key][order]

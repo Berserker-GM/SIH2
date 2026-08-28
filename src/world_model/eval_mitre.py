@@ -147,6 +147,7 @@ def main() -> None:
     parser.add_argument("--train-days", default=None)
     parser.add_argument("--val-days", default=None)
     parser.add_argument("--test-days", default=None)
+    parser.add_argument("--source", default="all", help="all | real | synthetic")
     args = parser.parse_args()
 
     npz_path = Path(args.npz)
@@ -186,6 +187,11 @@ def main() -> None:
         _parse_days(args.test_days),
     )
     print(f"[split]   mode={meta['mode']} present={meta['present']}")
+    if args.source != "all":
+        from src.world_model.eval_kstep import _filter_indices
+        val_i = _filter_indices(data, val_i, args.source, None)
+        test_i = _filter_indices(data, test_i, args.source, None)
+        print(f"[source]  eval slices restricted to {args.source}")
 
     train_states = scaler.transform(data["states"][train_i]).astype(np.float32)
     train_stages = data["stage_id"][train_i]

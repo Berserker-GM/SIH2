@@ -1,0 +1,2 @@
+# Drop persona JSON configs here: <persona_id>.json
+# Schema is owned by the persona generator; the world-model pipeline only reads CSVs.

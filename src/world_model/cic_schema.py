@@ -38,8 +38,8 @@ CIC2018_COLUMNS = [
 COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
     "dst_port": ("dst port", "destination port", "destinationport", "dstport"),
     "src_port": ("src port", "source port", "sourceport", "srcport"),
-    "src_ip": ("src ip", "source ip", "sourceip", "srcip"),
-    "dst_ip": ("dst ip", "destination ip", "destinationip", "dstip"),
+    "src_ip": ("src ip", "source ip", "sourceip", "srcip", "src host", "src_host"),
+    "dst_ip": ("dst ip", "destination ip", "destinationip", "dstip", "dst host", "dst_host"),
     "protocol": ("protocol",),
     "timestamp": ("timestamp", "flow start", "flowstart"),
     "flow_duration": ("flow duration", "flowduration"),
@@ -69,6 +69,11 @@ COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
 
 # Ordered state vector S_t. Indices 0–21 are flow-level; 22–31 packet-level.
 # Indices 29–31 stay 0 on CIC CSVs until a PCAP extractor fills them.
+#
+# SHARED INTERFACE with the persona generator: these 32 names, in this order,
+# are the feature columns of data/raw/personas/<persona_id>/<run_id>.csv.
+# Do not rename, reorder, or insert columns without updating that contract
+# on both sides first.
 STATE_FEATURE_ORDER = [
     # --- flow-level (NetFlow / IPFIX-style aggregates) ---
     "flow_count",
