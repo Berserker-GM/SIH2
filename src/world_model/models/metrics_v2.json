@@ -1,0 +1,921 @@
+{
+  "tag": "v2",
+  "sizes": {
+    "n_total": 48870,
+    "days_present": [
+      "2018-02-14",
+      "2018-02-15",
+      "2018-02-16",
+      "2018-02-21",
+      "2018-02-22",
+      "2018-02-23",
+      "2018-02-28",
+      "2018-03-01",
+      "2018-03-02",
+      "syn:benign_office_v1:run_000",
+      "syn:benign_office_v1:run_001",
+      "syn:benign_office_v1:run_002",
+      "syn:bot_c2_beacon_v1:run_000",
+      "syn:bot_c2_beacon_v1:run_001",
+      "syn:bot_c2_beacon_v1:run_002",
+      "syn:evasive_lateral_v1:run_000",
+      "syn:evasive_lateral_v1:run_001",
+      "syn:evasive_lateral_v1:run_002",
+      "syn:exfil_dns_v1:run_000",
+      "syn:exfil_dns_v1:run_001",
+      "syn:exfil_dns_v1:run_002",
+      "syn:impact_flood_v1:run_000",
+      "syn:impact_flood_v1:run_001",
+      "syn:impact_flood_v1:run_002",
+      "syn:recon_portscan_v1:run_000",
+      "syn:recon_portscan_v1:run_001",
+      "syn:recon_portscan_v1:run_002",
+      "syn:ssh_bruteforce_v1:run_000",
+      "syn:ssh_bruteforce_v1:run_001",
+      "syn:ssh_bruteforce_v1:run_002"
+    ],
+    "split_mode": "day",
+    "missing_train": [],
+    "missing_val": [],
+    "missing_test": [],
+    "synth_train_days": [
+      "syn:benign_office_v1:run_000",
+      "syn:bot_c2_beacon_v1:run_000",
+      "syn:evasive_lateral_v1:run_000",
+      "syn:exfil_dns_v1:run_000",
+      "syn:impact_flood_v1:run_000",
+      "syn:recon_portscan_v1:run_000",
+      "syn:ssh_bruteforce_v1:run_000"
+    ],
+    "synth_val_days": [
+      "syn:benign_office_v1:run_001",
+      "syn:bot_c2_beacon_v1:run_001",
+      "syn:evasive_lateral_v1:run_001",
+      "syn:exfil_dns_v1:run_001",
+      "syn:impact_flood_v1:run_001",
+      "syn:recon_portscan_v1:run_001",
+      "syn:ssh_bruteforce_v1:run_001"
+    ],
+    "synth_test_days": [
+      "syn:benign_office_v1:run_002",
+      "syn:bot_c2_beacon_v1:run_002",
+      "syn:evasive_lateral_v1:run_002",
+      "syn:exfil_dns_v1:run_002",
+      "syn:impact_flood_v1:run_002",
+      "syn:recon_portscan_v1:run_002",
+      "syn:ssh_bruteforce_v1:run_002"
+    ],
+    "train_days": [
+      "2018-02-14",
+      "2018-02-15",
+      "2018-02-16",
+      "2018-02-22",
+      "2018-02-28",
+      "syn:benign_office_v1:run_000",
+      "syn:bot_c2_beacon_v1:run_000",
+      "syn:evasive_lateral_v1:run_000",
+      "syn:exfil_dns_v1:run_000",
+      "syn:impact_flood_v1:run_000",
+      "syn:recon_portscan_v1:run_000",
+      "syn:ssh_bruteforce_v1:run_000"
+    ],
+    "val_days": [
+      "2018-02-23",
+      "syn:benign_office_v1:run_001",
+      "syn:bot_c2_beacon_v1:run_001",
+      "syn:evasive_lateral_v1:run_001",
+      "syn:exfil_dns_v1:run_001",
+      "syn:impact_flood_v1:run_001",
+      "syn:recon_portscan_v1:run_001",
+      "syn:ssh_bruteforce_v1:run_001"
+    ],
+    "test_days": [
+      "2018-02-21",
+      "2018-03-01",
+      "2018-03-02",
+      "syn:benign_office_v1:run_002",
+      "syn:bot_c2_beacon_v1:run_002",
+      "syn:evasive_lateral_v1:run_002",
+      "syn:exfil_dns_v1:run_002",
+      "syn:impact_flood_v1:run_002",
+      "syn:recon_portscan_v1:run_002",
+      "syn:ssh_bruteforce_v1:run_002"
+    ],
+    "n_train": 27669,
+    "n_val": 6996,
+    "n_test": 14205,
+    "seq_stats": {
+      "n_kept": 48347,
+      "n_rejected_day": 189,
+      "n_rejected_gap": 313,
+      "n_rejected_order": 0
+    }
+  },
+  "seq_len": 8,
+  "input_dim": 32,
+  "train_info": {
+    "best_val_loss": 1.1146798461920666,
+    "pos_weight": 3.0
+  },
+  "lstm_threshold_val_f1": 0.2,
+  "logreg_threshold_val_f1": 0.05,
+  "attack_threshold_frozen": 0.15,
+  "val": {
+    "split": "val",
+    "n": 6933,
+    "pos_rate": 0.20294244587421417,
+    "lstm_attack": {
+      "precision": 0.22898951947795135,
+      "recall": 0.8230277185501066,
+      "f1": 0.3582920792079208,
+      "fpr": 0.7055736518277235,
+      "accuracy": 0.4017020049040819,
+      "tp": 1158,
+      "fp": 3899,
+      "tn": 1627,
+      "fn": 249,
+      "support_pos": 1407,
+      "n": 6933
+    },
+    "logreg_attack": {
+      "precision": 0.20363372093023255,
+      "recall": 0.9957356076759062,
+      "f1": 0.33811994690479064,
+      "fpr": 0.9914947520810713,
+      "accuracy": 0.20885619500937544,
+      "tp": 1401,
+      "fp": 5479,
+      "tn": 47,
+      "fn": 6,
+      "support_pos": 1407,
+      "n": 6933
+    },
+    "lstm_next_state": {
+      "mse": 0.6073036789894104,
+      "mae": 0.3494214117527008,
+      "rmse": 0.7792969132425782
+    },
+    "persist_next_state": {
+      "mse": 0.8915696740150452,
+      "mae": 0.3596498370170593,
+      "rmse": 0.9442296722805554
+    },
+    "lstm_mse_reduction_vs_persist": 0.31883766721840945,
+    "lstm_threshold": 0.2,
+    "logreg_threshold": 0.05,
+    "beats_logreg_f1": true,
+    "beats_persist_mse": true,
+    "by_day": {
+      "2018-02-23": {
+        "n": 6653,
+        "lstm_attack": {
+          "precision": 0.19217081850533807,
+          "recall": 0.7866323907455013,
+          "f1": 0.3088829071332436,
+          "fpr": 0.7034269048487058,
+          "accuracy": 0.3825341950999549,
+          "tp": 918,
+          "fp": 3859,
+          "tn": 1627,
+          "fn": 249,
+          "support_pos": 1167,
+          "n": 6653
+        },
+        "logreg_attack": {
+          "precision": 0.1758824420542342,
+          "recall": 0.9948586118251928,
+          "f1": 0.298918640576725,
+          "fpr": 0.991615020051039,
+          "accuracy": 0.18142191492559748,
+          "tp": 1161,
+          "fp": 5440,
+          "tn": 46,
+          "fn": 6,
+          "support_pos": 1167,
+          "n": 6653
+        },
+        "lstm_next_state": {
+          "mse": 0.4508879482746124,
+          "mae": 0.3225364685058594,
+          "rmse": 0.6714819046516536
+        },
+        "persist_next_state": {
+          "mse": 0.6960727572441101,
+          "mae": 0.33680638670921326,
+          "rmse": 0.8343097489806229
+        }
+      },
+      "syn:benign_office_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 1.0,
+          "accuracy": 0.0,
+          "tp": 0,
+          "fp": 40,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.975,
+          "accuracy": 0.025,
+          "tp": 0,
+          "fp": 39,
+          "tn": 1,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.139733076095581,
+          "mae": 0.815882682800293,
+          "rmse": 1.462782648275396
+        },
+        "persist_next_state": {
+          "mse": 3.347203493118286,
+          "mae": 0.7538996338844299,
+          "rmse": 1.8295364148106716
+        }
+      },
+      "syn:bot_c2_beacon_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 6.7983856201171875,
+          "mae": 1.1069481372833252,
+          "rmse": 2.607371400494603
+        },
+        "persist_next_state": {
+          "mse": 6.366325855255127,
+          "mae": 0.921666145324707,
+          "rmse": 2.523157913261698
+        }
+      },
+      "syn:evasive_lateral_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 9.797433853149414,
+          "mae": 1.2720601558685303,
+          "rmse": 3.1300852788940774
+        },
+        "persist_next_state": {
+          "mse": 14.073263168334961,
+          "mae": 1.3545355796813965,
+          "rmse": 3.7514348146189294
+        }
+      },
+      "syn:exfil_dns_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.5041561126708984,
+          "mae": 0.9470769762992859,
+          "rmse": 1.5824525625341501
+        },
+        "persist_next_state": {
+          "mse": 3.623271942138672,
+          "mae": 0.8129392862319946,
+          "rmse": 1.9034894121425188
+        }
+      },
+      "syn:impact_flood_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 4.612649440765381,
+          "mae": 0.9970823526382446,
+          "rmse": 2.1477079505289773
+        },
+        "persist_next_state": {
+          "mse": 4.696275234222412,
+          "mae": 0.9491669535636902,
+          "rmse": 2.1670891154316685
+        }
+      },
+      "syn:recon_portscan_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.3649590015411377,
+          "mae": 0.9128084182739258,
+          "rmse": 1.5378423201164473
+        },
+        "persist_next_state": {
+          "mse": 3.6410117149353027,
+          "mae": 0.8154383897781372,
+          "rmse": 1.908143525769302
+        }
+      },
+      "syn:ssh_bruteforce_v1:run_001": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.049652576446533,
+          "mae": 0.8657249212265015,
+          "rmse": 1.4316607756191875
+        },
+        "persist_next_state": {
+          "mse": 3.0096499919891357,
+          "mae": 0.7093383073806763,
+          "rmse": 1.734834283725433
+        }
+      }
+    }
+  },
+  "test": {
+    "split": "test",
+    "n": 13938,
+    "pos_rate": 0.489022821187973,
+    "lstm_attack": {
+      "precision": 0.7342171717171717,
+      "recall": 0.34125586854460094,
+      "f1": 0.46594551282051283,
+      "fpr": 0.11822521763549565,
+      "accuracy": 0.6174487013918784,
+      "tp": 2326,
+      "fp": 842,
+      "tn": 6280,
+      "fn": 4490,
+      "support_pos": 6816,
+      "n": 13938
+    },
+    "logreg_attack": {
+      "precision": 0.5018189917588537,
+      "recall": 0.991637323943662,
+      "f1": 0.6664037466107962,
+      "fpr": 0.9421510811569784,
+      "accuracy": 0.5144927536231884,
+      "tp": 6759,
+      "fp": 6710,
+      "tn": 412,
+      "fn": 57,
+      "support_pos": 6816,
+      "n": 13938
+    },
+    "lstm_next_state": {
+      "mse": 44.01285934448242,
+      "mae": 0.6568141579627991,
+      "rmse": 6.634218819460391
+    },
+    "persist_next_state": {
+      "mse": 9.540583610534668,
+      "mae": 0.41671934723854065,
+      "rmse": 3.088783516294832
+    },
+    "lstm_mse_reduction_vs_persist": -3.613225054270645,
+    "lstm_threshold": 0.2,
+    "logreg_threshold": 0.05,
+    "beats_logreg_f1": false,
+    "beats_persist_mse": false,
+    "by_day": {
+      "2018-02-21": {
+        "n": 647,
+        "lstm_attack": {
+          "precision": 0.9365942028985508,
+          "recall": 0.8447712418300654,
+          "f1": 0.8883161512027491,
+          "fpr": 1.0,
+          "accuracy": 0.7990726429675425,
+          "tp": 517,
+          "fp": 35,
+          "tn": 0,
+          "fn": 95,
+          "support_pos": 612,
+          "n": 647
+        },
+        "logreg_attack": {
+          "precision": 0.9459041731066461,
+          "recall": 1.0,
+          "f1": 0.9722001588562351,
+          "fpr": 1.0,
+          "accuracy": 0.9459041731066461,
+          "tp": 612,
+          "fp": 35,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 612,
+          "n": 647
+        },
+        "lstm_next_state": {
+          "mse": 935.235595703125,
+          "mae": 6.07166051864624,
+          "rmse": 30.58162186188177
+        },
+        "persist_next_state": {
+          "mse": 189.01988220214844,
+          "mae": 1.497449517250061,
+          "rmse": 13.748450174552346
+        }
+      },
+      "2018-03-01": {
+        "n": 6741,
+        "lstm_attack": {
+          "precision": 0.6254681647940075,
+          "recall": 0.6251336898395722,
+          "f1": 0.6253008825889276,
+          "fpr": 0.1437076575651817,
+          "accuracy": 0.792167334223409,
+          "tp": 1169,
+          "fp": 700,
+          "tn": 4171,
+          "fn": 701,
+          "support_pos": 1870,
+          "n": 6741
+        },
+        "logreg_attack": {
+          "precision": 0.28770816812053923,
+          "recall": 0.9700534759358289,
+          "f1": 0.4437920489296636,
+          "fpr": 0.9219872716074728,
+          "accuracy": 0.32547099836819465,
+          "tp": 1814,
+          "fp": 4491,
+          "tn": 380,
+          "fn": 56,
+          "support_pos": 1870,
+          "n": 6741
+        },
+        "lstm_next_state": {
+          "mse": 0.5965542197227478,
+          "mae": 0.38713371753692627,
+          "rmse": 0.7723692249971822
+        },
+        "persist_next_state": {
+          "mse": 0.9448954463005066,
+          "mae": 0.4202952980995178,
+          "rmse": 0.9720573266533752
+        }
+      },
+      "2018-03-02": {
+        "n": 6270,
+        "lstm_attack": {
+          "precision": 0.8565310492505354,
+          "recall": 0.09770395701025891,
+          "f1": 0.17540013155009868,
+          "fpr": 0.03079044117647059,
+          "accuracy": 0.4001594896331738,
+          "tp": 400,
+          "fp": 67,
+          "tn": 2109,
+          "fn": 3694,
+          "support_pos": 4094,
+          "n": 6270
+        },
+        "logreg_attack": {
+          "precision": 0.6562449895783229,
+          "recall": 0.9997557401074744,
+          "f1": 0.7923724712031749,
+          "fpr": 0.9852941176470589,
+          "accuracy": 0.6578947368421053,
+          "tp": 4093,
+          "fp": 2144,
+          "tn": 32,
+          "fn": 1,
+          "support_pos": 4094,
+          "n": 6270
+        },
+        "lstm_next_state": {
+          "mse": 0.485534131526947,
+          "mae": 0.37233540415763855,
+          "rmse": 0.6968027924218925
+        },
+        "persist_next_state": {
+          "mse": 0.4074191153049469,
+          "mae": 0.2780037522315979,
+          "rmse": 0.6382939098134549
+        }
+      },
+      "syn:benign_office_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 1.0,
+          "accuracy": 0.0,
+          "tp": 0,
+          "fp": 40,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 1.0,
+          "accuracy": 0.0,
+          "tp": 0,
+          "fp": 40,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.298602819442749,
+          "mae": 0.8416293859481812,
+          "rmse": 1.516114382044689
+        },
+        "persist_next_state": {
+          "mse": 3.886934757232666,
+          "mae": 0.8301318287849426,
+          "rmse": 1.9715310693044292
+        }
+      },
+      "syn:bot_c2_beacon_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 7.879889488220215,
+          "mae": 1.1816495656967163,
+          "rmse": 2.807114085358879
+        },
+        "persist_next_state": {
+          "mse": 7.542638301849365,
+          "mae": 1.0014209747314453,
+          "rmse": 2.746386407963993
+        }
+      },
+      "syn:evasive_lateral_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 10.250163078308105,
+          "mae": 1.2460628747940063,
+          "rmse": 3.2015875871679826
+        },
+        "persist_next_state": {
+          "mse": 16.562597274780273,
+          "mae": 1.4045472145080566,
+          "rmse": 4.069717100091881
+        }
+      },
+      "syn:exfil_dns_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.5673279762268066,
+          "mae": 0.9468475580215454,
+          "rmse": 1.602288356141555
+        },
+        "persist_next_state": {
+          "mse": 3.0668461322784424,
+          "mae": 0.7126650810241699,
+          "rmse": 1.7512413118352486
+        }
+      },
+      "syn:impact_flood_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 4.645078659057617,
+          "mae": 1.0065906047821045,
+          "rmse": 2.1552444545938676
+        },
+        "persist_next_state": {
+          "mse": 6.051301002502441,
+          "mae": 1.074871301651001,
+          "rmse": 2.45993922740023
+        }
+      },
+      "syn:recon_portscan_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.4929566383361816,
+          "mae": 0.9573253393173218,
+          "rmse": 1.5789099525736676
+        },
+        "persist_next_state": {
+          "mse": 4.014983654022217,
+          "mae": 0.8836036920547485,
+          "rmse": 2.003742412093485
+        }
+      },
+      "syn:ssh_bruteforce_v1:run_002": {
+        "n": 40,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 40,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 40,
+          "n": 40
+        },
+        "lstm_next_state": {
+          "mse": 2.0722782611846924,
+          "mae": 0.8723984956741333,
+          "rmse": 1.439540989754961
+        },
+        "persist_next_state": {
+          "mse": 2.793027639389038,
+          "mae": 0.6700117588043213,
+          "rmse": 1.671235363253494
+        }
+      }
+    }
+  }
+}

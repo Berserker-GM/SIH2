@@ -6,8 +6,11 @@
 # Patterns are relative to this directory (data/).
 raw/*
 !raw/.gitkeep
+!raw/personas/
+!raw/personas/**
 processed/*
 !processed/.gitkeep
 !processed/live_slices/
 !processed/live_slices/**
+!processed/state_windows_combined.json
 !fixtures/

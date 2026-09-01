@@ -21,8 +21,10 @@ from src.world_model.dataset import (
     DEFAULT_TRAIN_DAYS,
     DEFAULT_VAL_DAYS,
     Scaler,
+    canonical_day_id,
     day_split,
     load_npz,
+    split_synthetic_days,
     temporal_split,
 )
 from src.world_model.model import LSTMWorldModel
@@ -38,6 +40,19 @@ from src.world_model.train import ROOT, _device, _parse_days
 DEFAULT_NPZ = ROOT / "data" / "processed" / "state_windows_multiday.npz"
 DEFAULT_CKPT = Path(__file__).resolve().parent / "models" / "world_lstm.pt"
 DEFAULT_SCALER = Path(__file__).resolve().parent / "models" / "scaler.npz"
+
+
+def _filter_indices(data: dict, idx: np.ndarray, source: str | None, days: list[str] | None) -> np.ndarray:
+    if len(idx) == 0:
+        return idx
+    keep = np.ones(len(idx), dtype=bool)
+    if source and source not in {"all", "*"}:
+        src = np.asarray(data.get("source", np.array(["real"] * len(data["states"]))))
+        keep &= src[idx] == source
+    if days:
+        want = {canonical_day_id(d) for d in days}
+        keep &= np.array([canonical_day_id(d) in want for d in data["day_id"][idx]])
+    return idx[keep]
 
 
 def _load_model(ckpt_path: Path) -> tuple[LSTMWorldModel, dict]:
@@ -64,12 +79,20 @@ def _split_indices(data: dict, train_days, val_days, test_days):
         tr = train_days or list(DEFAULT_TRAIN_DAYS)
         va = val_days or list(DEFAULT_VAL_DAYS)
         te = test_days or list(DEFAULT_TEST_DAYS)
+        syn_tr, syn_va, syn_te = split_synthetic_days(present)
+        if syn_tr or syn_va or syn_te:
+            tr = list(tr) + [d for d in syn_tr if d not in tr]
+            va = list(va) + [d for d in syn_va if d not in va]
+            te = list(te) + [d for d in syn_te if d not in te]
         return day_split(data["day_id"], tr, va, te), {
             "mode": "day",
             "present": present,
             "train_days": tr,
             "val_days": va,
             "test_days": te,
+            "synth_train_days": syn_tr,
+            "synth_val_days": syn_va,
+            "synth_test_days": syn_te,
         }
     return temporal_split(n), {"mode": "temporal", "present": present}
 
@@ -166,6 +189,7 @@ def main() -> None:
     parser.add_argument("--train-days", default=None)
     parser.add_argument("--val-days", default=None)
     parser.add_argument("--test-days", default=None)
+    parser.add_argument("--source", default="all", help="all | real | synthetic")
     args = parser.parse_args()
 
     npz_path = Path(args.npz)
@@ -203,6 +227,11 @@ def main() -> None:
         _parse_days(args.test_days),
     )
     print(f"[split]   mode={meta['mode']} present={meta['present']}")
+    if args.source != "all":
+        train_i = _filter_indices(data, train_i, args.source, None)
+        val_i = _filter_indices(data, val_i, args.source, None)
+        test_i = _filter_indices(data, test_i, args.source, None)
+        print(f"[source]  {args.source}  train={len(train_i)} val={len(val_i)} test={len(test_i)}")
 
     report = {
         "k": args.k,

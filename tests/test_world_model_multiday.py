@@ -61,6 +61,7 @@ print("\n-- Canonical day ids --------------------------------------------------
 check("filename Wed-14", canonical_day_id("Wednesday-14-02-2018_TrafficForML_CICFlowMeter.csv") == "2018-02-14")
 check("iso date passthrough", canonical_day_id("2018-03-01") == "2018-03-01")
 check("01-Mar filename", canonical_day_id("Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv") == "2018-03-01")
+check("syn run passthrough", canonical_day_id("syn:ssh_bruteforce_v1:run_000") == "syn:ssh_bruteforce_v1:run_000")
 
 
 print("\n-- Per-file window metadata -------------------------------------------")

@@ -22,5 +22,8 @@ data/processed/*.npz
 data/processed/*.json
 !data/processed/live_slices/
 !data/processed/live_slices/**
+!data/processed/state_windows_combined.json
+!data/raw/personas/
+!data/raw/personas/**
 # GitHub 100MB file limit
 data/processed/live_slices/Friday-16-02-2018_TrafficForML_CICFlowMeter_s90.csv

@@ -22,12 +22,14 @@ from src.world_model.dataset import (
     DEFAULT_TEST_DAYS,
     DEFAULT_TRAIN_DAYS,
     DEFAULT_VAL_DAYS,
+    DAY_ID_DTYPE,
     SequenceStats,
     canonical_day_id,
     day_split,
     fit_scaler,
     load_npz,
     make_sequences,
+    split_synthetic_days,
     temporal_split,
 )
 from src.world_model.metrics import (
@@ -84,6 +86,14 @@ def _prepare(
         tr_days = train_days or list(DEFAULT_TRAIN_DAYS)
         va_days = val_days or list(DEFAULT_VAL_DAYS)
         te_days = test_days or list(DEFAULT_TEST_DAYS)
+        syn_tr, syn_va, syn_te = split_synthetic_days(present)
+        if syn_tr or syn_va or syn_te:
+            tr_days = list(tr_days) + [d for d in syn_tr if d not in tr_days]
+            va_days = list(va_days) + [d for d in syn_va if d not in va_days]
+            te_days = list(te_days) + [d for d in syn_te if d not in te_days]
+            split_meta["synth_train_days"] = syn_tr
+            split_meta["synth_val_days"] = syn_va
+            split_meta["synth_test_days"] = syn_te
         train_i, val_i, test_i = day_split(data["day_id"], tr_days, va_days, te_days)
         split_meta.update({
             "train_days": tr_days,
@@ -122,7 +132,7 @@ def _prepare(
                 "y_atk": np.zeros((0,), dtype=np.float32),
                 "last": np.zeros((0, INPUT_DIM), dtype=np.float32),
                 "persist": np.zeros((0, INPUT_DIM), dtype=np.float32),
-                "seq_days": np.array([], dtype="U10"),
+                "seq_days": np.array([], dtype=DAY_ID_DTYPE),
                 "seq_stats": SequenceStats(),
                 "n_raw": 0,
                 "pos_rate": 0.0,
@@ -352,7 +362,7 @@ def _print_day_table(report_split: dict) -> None:
     if not by_day:
         print("  (no per-day breakdown)")
         return
-    hdr = f"{'day':12s} {'model':7s} {'P':>7s} {'R':>7s} {'F1':>7s} {'FPR':>7s} {'acc':>7s} {'MSE':>10s}"
+    hdr = f"{'day':36s} {'model':7s} {'P':>7s} {'R':>7s} {'F1':>7s} {'FPR':>7s} {'acc':>7s} {'MSE':>10s}"
     print(hdr)
     for day, block in by_day.items():
         rows = (
@@ -362,7 +372,7 @@ def _print_day_table(report_split: dict) -> None:
         for model_name, atk, mse in rows:
             mse_s = f"{mse:10.4f}" if mse is not None else f"{'n/a':>10s}"
             print(
-                f"{day:12s} {model_name:7s} "
+                f"{day:36s} {model_name:7s} "
                 f"{atk['precision']:7.3f} {atk['recall']:7.3f} {atk['f1']:7.3f} "
                 f"{atk['fpr']:7.3f} {atk['accuracy']:7.3f} {mse_s}"
             )
@@ -395,6 +405,16 @@ def main() -> None:
         "--check-data",
         action="store_true",
         help="Load NPZ, build splits/sequences, print leakage stats, then exit (no training)",
+    )
+    parser.add_argument(
+        "--tag",
+        default="",
+        help="Artifact suffix. 'v2' writes world_lstm_v2.pt + scaler_v2.npz (does not overwrite v1).",
+    )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Allow replacing world_lstm.pt / scaler.npz (v1). Default: refuse.",
     )
     args = parser.parse_args()
 
@@ -477,14 +497,38 @@ def main() -> None:
         patience=args.patience,
     )
 
+    tag = (args.tag or "").strip()
+    if tag:
+        weights_path = out_dir / f"world_lstm_{tag}.pt"
+        scaler_path = out_dir / f"scaler_{tag}.npz"
+        metrics_path = out_dir / f"metrics_{tag}.json"
+        decoder_path = out_dir / f"stage_decoder_{tag}.joblib"
+    else:
+        weights_path = out_dir / "world_lstm.pt"
+        scaler_path = out_dir / "scaler.npz"
+        metrics_path = out_dir / "metrics.json"
+        decoder_path = out_dir / "stage_decoder.joblib"
+
+    v1_names = {"world_lstm.pt", "scaler.npz"}
+    if not args.overwrite:
+        blocked = [p for p in (weights_path, scaler_path) if p.name in v1_names and p.exists()]
+        if blocked:
+            raise SystemExit(
+                "Refusing to overwrite v1 artifacts: "
+                + ", ".join(p.name for p in blocked)
+                + ". Pass --tag v2 (writes world_lstm_v2.pt / scaler_v2.npz) or --overwrite."
+            )
+
     print("\n[LR] fitting logistic regression on the same 32 features")
     clf, lr_threshold = train_logreg(train, val)
 
     _, val_prob = predict_lstm(model, val)
     lstm_threshold = best_f1_threshold(val["y_atk"], val_prob)
     print(f"[thr] LSTM={lstm_threshold:.2f}  LogReg={lr_threshold:.2f}  (chosen on val F1)")
+    print("      dashboard / score_history still use the frozen 0.15 alert threshold unless noted")
 
     report = {
+        "tag": tag or "v1",
         "sizes": sizes,
         "seq_len": args.seq_len,
         "input_dim": INPUT_DIM,
@@ -492,11 +536,13 @@ def main() -> None:
             "best_val_loss": train_info["best_val_loss"],
             "pos_weight": train_info["pos_weight"],
         },
+        "lstm_threshold_val_f1": lstm_threshold,
+        "logreg_threshold_val_f1": lr_threshold,
+        "attack_threshold_frozen": 0.15,
         "val": evaluate(model, clf, lstm_threshold, lr_threshold, val, "val"),
         "test": evaluate(model, clf, lstm_threshold, lr_threshold, test, "test"),
     }
 
-    weights_path = out_dir / "world_lstm.pt"
     torch.save(
         {
             "state_dict": model.state_dict(),
@@ -505,15 +551,31 @@ def main() -> None:
             "num_layers": args.num_layers,
             "seq_len": args.seq_len,
             "lstm_threshold": lstm_threshold,
+            "tag": tag or "v1",
         },
         weights_path,
     )
-    scaler.save(out_dir / "scaler.npz")
-    metrics_path = out_dir / "metrics.json"
+    scaler.save(scaler_path)
+
+    if sizes.get("split_mode") == "day" and "stage_id" in load_npz(npz_path):
+        from src.world_model.mitre_decode import fit_stage_decoder
+        import joblib
+
+        data = load_npz(npz_path)
+        tr_i, _, _ = day_split(
+            data["day_id"], sizes["train_days"], sizes["val_days"], sizes["test_days"],
+        )
+        decoder = fit_stage_decoder(
+            scaler.transform(data["states"][tr_i]).astype(np.float32),
+            data["stage_id"][tr_i],
+        )
+        joblib.dump(decoder.clf, decoder_path)
+        print(f"[saved] {decoder_path}")
+
     metrics_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     print(f"\n[saved] {weights_path}")
-    print(f"[saved] {out_dir / 'scaler.npz'}")
+    print(f"[saved] {scaler_path}")
     print(f"[saved] {metrics_path}")
 
     test_m = report["test"]

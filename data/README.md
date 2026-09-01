@@ -42,8 +42,31 @@ python tests/test_world_model_train.py
 
 - **Δt = 5 seconds**, stride 5s, lookahead **K = 6** (30 seconds).
 - 32-d vector: flow-level aggregates (ports, flags, bytes, IAT) + packet-level CICFlowMeter stats (pkt len, TCP window, PSH, port-scan score).
-- `ttl_variance`, `ip_fragment_flags`, `retransmit_count` are **0 until PCAP parsing** (not present in CIC ML CSVs).
+- `ttl_variance`, `ip_fragment_flags`, `retransmit_count` are **0 until PCAP parsing** (not present in CIC ML CSVs). Synthetic persona CSVs fill these three dims with real numbers.
 - Labels: `attack_now`, `attack_within_k`, `infiltration_within_k`, MITRE stage from the CIC attack name.
+
+## Persona CSVs (pre-aggregated 32-d rows)
+
+The persona generator writes **already-windowed** state vectors, not CICFlowMeter flows:
+
+```
+data/raw/personas/<persona_id>/<run_id>.csv
+personas/configs/<persona_id>.json
+personas/adaptation_logs/<persona_id>/<run_id>.jsonl
+```
+
+Column order is the shared interface in `src/world_model/personas.py` (`PERSONA_CSV_COLUMNS`): 5 meta columns + `STATE_FEATURE_ORDER`. Each `(persona_id, run_id)` is one split "day" (`syn:{persona_id}:{run_id}`).
+
+```bash
+# Merge existing CIC NPZ with persona CSVs (writes fixtures if the folder is empty)
+python -m src.world_model.prepare_dataset --cic-npz data/processed/state_windows_multiday.npz --personas-dir data/raw/personas --write-persona-fixtures --out data/processed/state_windows_combined.npz
+
+# Train v2 without touching world_lstm.pt / scaler.npz
+python -m src.world_model.train --npz data/processed/state_windows_combined.npz --tag v2
+
+# Adaptive-persona scoring (in-process, not HTTP)
+# from src.world_model.service import score_history
+```
 
 ML CSVs do **not** include Src/Dst IP. The world model still builds a **service graph** G_t from dest ports in the same 5s bin as S_t (unobserved-client → dest port). A **host graph** (Src IP → Dst IP) is used when those columns exist (GeneratedLabelledFlows / PCAP / the 20 Feb LOIC-HTTP ML CSV). IPs are not stuffed into the frozen 32-d LSTM vector.
 

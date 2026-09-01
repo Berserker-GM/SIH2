@@ -12,6 +12,7 @@ import pandas as pd
 
 from src.world_model.cic_schema import CIC2018_COLUMNS, INPUT_DIM, STATE_FEATURE_ORDER
 from src.world_model.dataset import concat_window_bundles
+from src.world_model.personas import load_persona_dir, write_schema_fixtures
 from src.world_model.windows import WindowConfig, build_state_windows, load_cic_csv
 
 
@@ -72,7 +73,9 @@ def generate_demo_flows(
 def discover_cic_csvs(csv_dir: Path) -> list[Path]:
     files = sorted(
         p for p in csv_dir.rglob("*.csv")
-        if p.is_file() and not p.name.startswith(".")
+        if p.is_file()
+        and not p.name.startswith(".")
+        and "personas" not in p.parts
     )
     return files
 
@@ -117,6 +120,8 @@ def save_windows(bundle: dict, out_path: Path) -> None:
     payload = {k: v for k, v in bundle.items() if not str(k).startswith("_")}
     np.savez_compressed(out_path, **payload)
     unique_days = sorted(set(map(str, bundle["day_id"]))) if "day_id" in bundle else []
+    sources = sorted(set(map(str, bundle["source"]))) if "source" in bundle else []
+    n_synth = int((np.asarray(bundle["source"]) == "synthetic").sum()) if "source" in bundle else 0
     meta = {
         "n_pairs": int(bundle["states"].shape[0]),
         "input_dim": int(bundle["states"].shape[1]),
@@ -124,6 +129,8 @@ def save_windows(bundle: dict, out_path: Path) -> None:
         "window_seconds": int(bundle["window_seconds"][0]),
         "horizon_k": int(bundle["horizon_k"][0]),
         "days": unique_days,
+        "sources": sources,
+        "n_synthetic": n_synth,
         "attack_rate_now": float(bundle["attack_now"].mean()),
         "attack_within_k_rate": float(bundle["attack_within_k"].mean()),
         "infiltration_within_k_rate": float(bundle["infiltration_within_k"].mean()),
@@ -156,6 +163,21 @@ def main() -> None:
     parser.add_argument("--window-seconds", type=int, default=5)
     parser.add_argument("--horizon-k", type=int, default=6)
     parser.add_argument("--nrows", type=int, default=None, help="Optional row cap per file")
+    parser.add_argument(
+        "--personas-dir",
+        default=None,
+        help="Directory of pre-aggregated persona CSVs (default: data/raw/personas)",
+    )
+    parser.add_argument(
+        "--cic-npz",
+        default=None,
+        help="Reuse an existing CIC window NPZ instead of re-windowing CSVs",
+    )
+    parser.add_argument(
+        "--write-persona-fixtures",
+        action="store_true",
+        help="If --personas-dir is empty, write 7-stage schema fixtures there",
+    )
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[2]
@@ -199,11 +221,27 @@ def main() -> None:
         save_windows(bundle, out)
         return
 
-    if not unique_paths:
-        raise SystemExit("Pass --csv PATH, --csv-dir DIR, or --demo")
-
     bundles = []
     total_rows = 0
+
+    cic_npz = Path(args.cic_npz) if args.cic_npz else None
+    if cic_npz is not None:
+        if not cic_npz.is_absolute():
+            cic_npz = root / cic_npz
+        if not cic_npz.is_file():
+            raise SystemExit(f"--cic-npz not found: {cic_npz}")
+        from src.world_model.dataset import load_npz
+        cic = load_npz(cic_npz)
+        print(f"[cic-npz] {cic_npz}  pairs={len(cic['states'])}  days={sorted(set(map(str, cic['day_id'])))}")
+        cic["window_seconds"] = np.array([cfg.window_seconds])
+        cic["horizon_k"] = np.array([cfg.horizon_k])
+        cic["feature_names"] = np.array(STATE_FEATURE_ORDER)
+        bundles.append(cic)
+
+    merge_personas = args.personas_dir is not None or args.write_persona_fixtures
+    if not unique_paths and cic_npz is None and not merge_personas:
+        raise SystemExit("Pass --csv PATH, --csv-dir DIR, --cic-npz NPZ, --personas-dir DIR, or --demo")
+
     for path in unique_paths:
         if not path.is_file():
             raise SystemExit(f"CSV not found: {path}")
@@ -211,9 +249,33 @@ def main() -> None:
         total_rows += int(bundle.pop("_n_raw_rows")[0])
         bundles.append(bundle)
 
-    combined = concat_window_bundles(bundles)
+    personas_dir = Path(args.personas_dir) if args.personas_dir else (root / "data" / "raw" / "personas")
+    if not personas_dir.is_absolute():
+        personas_dir = root / personas_dir
+    if merge_personas:
+        if args.write_persona_fixtures:
+            personas_dir.mkdir(parents=True, exist_ok=True)
+            from src.world_model.personas import discover_persona_csvs
+            if not discover_persona_csvs(personas_dir):
+                written = write_schema_fixtures(personas_dir)
+                print(f"[fixtures] wrote {len(written)} schema CSVs under {personas_dir} "
+                      "(stand-in until the 20-persona generator lands)")
+        persona_bundle = load_persona_dir(personas_dir, cfg) if personas_dir.is_dir() else None
+        if persona_bundle is not None:
+            bundles.append(persona_bundle)
+            print(
+                f"[persona] merged {len(persona_bundle['states'])} synthetic pairs  "
+                f"runs={sorted(set(map(str, persona_bundle['day_id'])))}"
+            )
+        else:
+            print(f"[persona] no CSVs under {personas_dir}")
+
+    if not bundles:
+        raise SystemExit("Nothing to write: no CIC CSVs/NPZ and no persona CSVs")
+
+    combined = concat_window_bundles(bundles) if len(bundles) > 1 else bundles[0]
     print(
-        f"[total] files={len(bundles)}  raw_rows={total_rows}  "
+        f"[total] cic_files={len(unique_paths)}  raw_rows={total_rows}  "
         f"pairs={len(combined['states'])}  days={sorted(set(map(str, combined['day_id'])))}"
     )
     save_windows(combined, out)
