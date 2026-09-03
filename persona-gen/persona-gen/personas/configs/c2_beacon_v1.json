@@ -1,0 +1,61 @@
+{
+  "persona_id": "c2_beacon_v1",
+  "family": "command_and_control",
+  "mitre_technique": "T1071.001",
+  "adaptive": false,
+  "base_seed": 2101,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.05,
+    "jitter_pct": 0.2
+  },
+  "flags": {
+    "syn_ratio": 0.05,
+    "ack_ratio": 0.7,
+    "fin_ratio": 0.02,
+    "rst_ratio": 0.01,
+    "psh_ratio": 0.15,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.9,
+    "down_up_ratio_std": 0.15,
+    "bidirectional_ratio_mean": 0.8,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      443,
+      80
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 250,
+    "std": 60
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.005
+  },
+  "phases": [
+    {
+      "name": "beacon",
+      "mitre_stage": "command_and_control",
+      "technique_id": "T1071.001",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.1,
+    "blend_alpha": 0.2
+  },
+  "_notes": "T1071.001 (Application Layer Protocol: Web Protocols) \u2014 periodic low-volume beaconing over HTTPS/HTTP that blends with normal web traffic on the wire. Low flow rate (one beacon roughly every ~20s per window-lambda), small near-uniform payload sizes (check-in requests), timing jitter present but bounded \u2014 real C2 frameworks jitter beacons to avoid a perfectly periodic IAT signature, but not so much that they miss check-ins."
+}

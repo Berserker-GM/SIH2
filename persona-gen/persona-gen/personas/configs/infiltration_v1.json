@@ -1,0 +1,63 @@
+{
+  "persona_id": "infiltration_v1",
+  "family": "lateral_movement",
+  "mitre_technique": "T1210",
+  "adaptive": false,
+  "base_seed": 1401,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.6,
+    "jitter_pct": 0.3
+  },
+  "flags": {
+    "syn_ratio": 0.12,
+    "ack_ratio": 0.55,
+    "fin_ratio": 0.08,
+    "rst_ratio": 0.03,
+    "psh_ratio": 0.15,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 0.8,
+    "down_up_ratio_mean": 1.5,
+    "down_up_ratio_std": 0.5,
+    "bidirectional_ratio_mean": 0.6,
+    "port_scan_score_base": 0.02,
+    "port_scan_score_gain": 0.1
+  },
+  "ports": {
+    "pool": [
+      445,
+      135,
+      139,
+      3389
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 800,
+    "std": 400
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 2,
+    "fragment_rate": 0.02,
+    "retransmit_rate": 0.02
+  },
+  "phases": [
+    {
+      "name": "internal_probe",
+      "mitre_stage": "lateral_movement",
+      "technique_id": "T1210",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "CIC-IDS2018 'Infiltration' class analogue \u2014 internal-network exploitation of a remote service, moderate byte volume with irregular timing (interactive, not bulk)."
+}

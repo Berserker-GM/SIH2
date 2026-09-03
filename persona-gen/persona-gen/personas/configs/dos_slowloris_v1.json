@@ -1,0 +1,61 @@
+{
+  "persona_id": "dos_slowloris_v1",
+  "family": "impact",
+  "mitre_technique": "T1499.002",
+  "adaptive": false,
+  "base_seed": 1202,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.8,
+    "jitter_pct": 0.1
+  },
+  "flags": {
+    "syn_ratio": 0.15,
+    "ack_ratio": 0.7,
+    "fin_ratio": 0.01,
+    "rst_ratio": 0.02,
+    "psh_ratio": 0.05,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.4,
+    "down_up_ratio_std": 0.1,
+    "bidirectional_ratio_mean": 0.9,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      80,
+      443
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 40,
+    "std": 15
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.02
+  },
+  "phases": [
+    {
+      "name": "slow_hold",
+      "mitre_stage": "impact",
+      "technique_id": "T1499.002",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "Low-and-slow application-layer DoS: low flow rate but connections held open (long duration_max), tiny partial-header payloads. Deliberately the opposite shape of dos_hulk_v1 so 'impact' isn't a single monolithic pattern."
+}

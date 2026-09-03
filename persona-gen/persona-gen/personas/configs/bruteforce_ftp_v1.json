@@ -1,0 +1,60 @@
+{
+  "persona_id": "bruteforce_ftp_v1",
+  "family": "initial_access",
+  "mitre_technique": "T1110.001",
+  "adaptive": false,
+  "base_seed": 1102,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 3.5,
+    "jitter_pct": 0.1
+  },
+  "flags": {
+    "syn_ratio": 0.5,
+    "ack_ratio": 0.35,
+    "fin_ratio": 0.05,
+    "rst_ratio": 0.1,
+    "psh_ratio": 0.08,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 1.1,
+    "down_up_ratio_std": 0.2,
+    "bidirectional_ratio_mean": 0.85,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.02
+  },
+  "ports": {
+    "pool": [
+      21
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 100,
+    "std": 30
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.03
+  },
+  "phases": [
+    {
+      "name": "brute",
+      "mitre_stage": "initial_access",
+      "technique_id": "T1110.001",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "CIC-IDS2018 FTP-Bruteforce analogue; same shape as SSH variant with FTP control-port targeting and slightly lower RST rate (protocol responds differently to bad auth)."
+}

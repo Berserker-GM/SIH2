@@ -1,0 +1,116 @@
+{
+  "persona_id": "evasive_lateral_v1",
+  "family": "lateral_movement",
+  "mitre_technique": "T1021.002",
+  "adaptive": true,
+  "base_seed": 3003,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.7,
+    "jitter_pct": 0.15
+  },
+  "flags": {
+    "syn_ratio": 0.15,
+    "ack_ratio": 0.5,
+    "fin_ratio": 0.08,
+    "rst_ratio": 0.04,
+    "psh_ratio": 0.12,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 1.2,
+    "down_up_ratio_std": 0.3,
+    "bidirectional_ratio_mean": 0.6,
+    "port_scan_score_base": 0.01,
+    "port_scan_score_gain": 0.08
+  },
+  "ports": {
+    "pool": [
+      445,
+      139,
+      3389
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 700,
+    "std": 250
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.01,
+    "retransmit_rate": 0.015
+  },
+  "phases": [
+    {
+      "name": "stage",
+      "mitre_stage": "reconnaissance",
+      "technique_id": "T1046",
+      "dwell_windows": [
+        4,
+        8
+      ],
+      "next": "move"
+    },
+    {
+      "name": "move",
+      "mitre_stage": "lateral_movement",
+      "technique_id": "T1021.002",
+      "dwell_windows": [
+        10,
+        25
+      ],
+      "next": null,
+      "timing": {
+        "interarrival_dist": "exponential",
+        "lambda": 0.7,
+        "jitter_pct": 0.15
+      },
+      "flags": {
+        "syn_ratio": 0.15,
+        "ack_ratio": 0.5,
+        "fin_ratio": 0.08,
+        "rst_ratio": 0.04,
+        "psh_ratio": 0.12,
+        "urg_ratio": 0.0,
+        "tcp_ratio": 1.0,
+        "down_up_ratio_mean": 1.2,
+        "down_up_ratio_std": 0.3,
+        "bidirectional_ratio_mean": 0.6,
+        "port_scan_score_base": 0.01,
+        "port_scan_score_gain": 0.08
+      },
+      "packet_fields": {
+        "ttl_base": 64,
+        "ttl_jitter": 1,
+        "fragment_rate": 0.01,
+        "retransmit_rate": 0.015
+      }
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.1,
+    "blend_alpha": 0.2
+  },
+  "search_space": {
+    "move.timing.lambda": {
+      "min": 0.1,
+      "max": 1.2,
+      "step": 0.1
+    },
+    "move.flags.port_scan_score_gain": {
+      "min": 0.02,
+      "max": 0.12,
+      "step": 0.01
+    },
+    "move.packet_fields.fragment_rate": {
+      "min": 0.0,
+      "max": 0.05,
+      "step": 0.01
+    },
+    "kill_chain_target_phase": "move",
+    "step_budget_windows": 35
+  },
+  "_notes": "The named example in the brief: evasive SMB-style lateral movement. Hill-climbing tunes movement rate and port-diversity signal, but the persona must still complete the 'stage -> move' kill chain within 35 windows \u2014 an evasive persona that just goes quiet forever is not demonstrating evasion."
+}

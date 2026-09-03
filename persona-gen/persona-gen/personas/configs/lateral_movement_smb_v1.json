@@ -1,0 +1,61 @@
+{
+  "persona_id": "lateral_movement_smb_v1",
+  "family": "lateral_movement",
+  "mitre_technique": "T1021.002",
+  "adaptive": false,
+  "base_seed": 1402,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 1.0,
+    "jitter_pct": 0.2
+  },
+  "flags": {
+    "syn_ratio": 0.2,
+    "ack_ratio": 0.5,
+    "fin_ratio": 0.08,
+    "rst_ratio": 0.04,
+    "psh_ratio": 0.15,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 1.2,
+    "down_up_ratio_std": 0.3,
+    "bidirectional_ratio_mean": 0.65,
+    "port_scan_score_base": 0.01,
+    "port_scan_score_gain": 0.08
+  },
+  "ports": {
+    "pool": [
+      445,
+      139
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 900,
+    "std": 300
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.01,
+    "retransmit_rate": 0.015
+  },
+  "phases": [
+    {
+      "name": "smb_move",
+      "mitre_stage": "lateral_movement",
+      "technique_id": "T1021.002",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "SMB/Windows-admin-share style lateral movement (psexec-like). Dataset-calibrated using CIC-IDS2018's internal-traffic infiltration stats as the closest analogue, narrowed to the SMB port pair."
+}

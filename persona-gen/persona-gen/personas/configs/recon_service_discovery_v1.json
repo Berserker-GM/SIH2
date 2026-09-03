@@ -1,0 +1,70 @@
+{
+  "persona_id": "recon_service_discovery_v1",
+  "family": "reconnaissance",
+  "mitre_technique": "T1046",
+  "adaptive": false,
+  "base_seed": 2002,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.5,
+    "jitter_pct": 0.25
+  },
+  "flags": {
+    "syn_ratio": 0.6,
+    "ack_ratio": 0.25,
+    "fin_ratio": 0.05,
+    "rst_ratio": 0.2,
+    "psh_ratio": 0.05,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 0.7,
+    "down_up_ratio_mean": 0.6,
+    "down_up_ratio_std": 0.2,
+    "bidirectional_ratio_mean": 0.35,
+    "port_scan_score_base": 0.15,
+    "port_scan_score_gain": 0.4
+  },
+  "ports": {
+    "pool": [
+      21,
+      22,
+      23,
+      25,
+      80,
+      135,
+      139,
+      443,
+      445,
+      3389,
+      8080
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 90,
+    "std": 30
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.0
+  },
+  "phases": [
+    {
+      "name": "service_probe",
+      "mitre_stage": "reconnaissance",
+      "technique_id": "T1046",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.15,
+    "blend_alpha": 0.25
+  },
+  "_notes": "T1046 (Network Service Discovery) \u2014 slower, more targeted than a raw port sweep: probes a curated list of commonly-exploited service ports rather than a sequential block, with longer inter-probe gaps ('longer inter-probe intervals to evade flow-threshold detection' per the brief) and slightly more of the probes getting a real service response (higher bidirectional_ratio than pure sweeping)."
+}

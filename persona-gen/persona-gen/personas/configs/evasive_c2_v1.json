@@ -1,0 +1,100 @@
+{
+  "persona_id": "evasive_c2_v1",
+  "family": "command_and_control",
+  "mitre_technique": "T1071.001",
+  "adaptive": true,
+  "base_seed": 3002,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.1,
+    "jitter_pct": 0.2
+  },
+  "flags": {
+    "syn_ratio": 0.03,
+    "ack_ratio": 0.7,
+    "fin_ratio": 0.02,
+    "rst_ratio": 0.01,
+    "psh_ratio": 0.12,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.9,
+    "down_up_ratio_std": 0.15,
+    "bidirectional_ratio_mean": 0.8,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      443,
+      80
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 220,
+    "std": 60
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.005
+  },
+  "phases": [
+    {
+      "name": "establish",
+      "mitre_stage": "command_and_control",
+      "technique_id": "T1071.001",
+      "dwell_windows": [
+        4,
+        8
+      ],
+      "next": "sustain"
+    },
+    {
+      "name": "sustain",
+      "mitre_stage": "command_and_control",
+      "technique_id": "T1071.001",
+      "dwell_windows": [
+        20,
+        40
+      ],
+      "next": null,
+      "timing": {
+        "interarrival_dist": "exponential",
+        "lambda": 0.1,
+        "jitter_pct": 0.2
+      },
+      "payload": {
+        "size_dist": "lognormal",
+        "mean": 220,
+        "std": 60
+      }
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.12,
+    "blend_alpha": 0.25
+  },
+  "search_space": {
+    "sustain.timing.lambda": {
+      "min": 0.02,
+      "max": 0.3,
+      "step": 0.02
+    },
+    "sustain.timing.jitter_pct": {
+      "min": 0.1,
+      "max": 0.7,
+      "step": 0.05
+    },
+    "sustain.payload.std": {
+      "min": 20,
+      "max": 150,
+      "step": 15
+    },
+    "kill_chain_target_phase": "sustain",
+    "step_budget_windows": 50
+  },
+  "_notes": "Evasive beaconing: hill-climbing widens beacon-interval jitter and payload-size variance to break up the periodic-beacon signature detectors look for, but the budget constraint means it can't just go silent \u2014 it must still reach 'sustain' (i.e. keep beaconing) within 50 windows."
+}

@@ -1,0 +1,61 @@
+{
+  "persona_id": "dos_hulk_v1",
+  "family": "impact",
+  "mitre_technique": "T1499",
+  "adaptive": false,
+  "base_seed": 1201,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 25.0,
+    "jitter_pct": 0.05
+  },
+  "flags": {
+    "syn_ratio": 0.7,
+    "ack_ratio": 0.2,
+    "fin_ratio": 0.02,
+    "rst_ratio": 0.05,
+    "psh_ratio": 0.03,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.6,
+    "down_up_ratio_std": 0.1,
+    "bidirectional_ratio_mean": 0.95,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      80,
+      443
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 200,
+    "std": 60
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.06
+  },
+  "phases": [
+    {
+      "name": "flood",
+      "mitre_stage": "impact",
+      "technique_id": "T1499",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "CIC-IDS2018 DoS-Hulk analogue: very high flow rate, SYN-heavy, single target port, elevated retransmits from the victim's saturated queue."
+}

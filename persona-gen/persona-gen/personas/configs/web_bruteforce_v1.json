@@ -1,0 +1,63 @@
+{
+  "persona_id": "web_bruteforce_v1",
+  "family": "initial_access",
+  "mitre_technique": "T1110.003",
+  "adaptive": false,
+  "base_seed": 1103,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 5.0,
+    "jitter_pct": 0.15
+  },
+  "flags": {
+    "syn_ratio": 0.3,
+    "ack_ratio": 0.45,
+    "fin_ratio": 0.1,
+    "rst_ratio": 0.05,
+    "psh_ratio": 0.2,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 1.3,
+    "down_up_ratio_std": 0.3,
+    "bidirectional_ratio_mean": 0.8,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.02
+  },
+  "ports": {
+    "pool": [
+      80,
+      443,
+      8080,
+      8443
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 350,
+    "std": 100
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.02
+  },
+  "phases": [
+    {
+      "name": "brute",
+      "mitre_stage": "initial_access",
+      "technique_id": "T1110.003",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "Web-login credential stuffing (POST-flood against a login form) \u2014 higher PSH density than raw SSH/FTP brute force since each attempt carries an HTTP body."
+}

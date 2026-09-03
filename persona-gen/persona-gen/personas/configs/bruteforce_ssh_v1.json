@@ -1,0 +1,60 @@
+{
+  "persona_id": "bruteforce_ssh_v1",
+  "family": "initial_access",
+  "mitre_technique": "T1110.001",
+  "adaptive": false,
+  "base_seed": 1101,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 4.0,
+    "jitter_pct": 0.1
+  },
+  "flags": {
+    "syn_ratio": 0.55,
+    "ack_ratio": 0.3,
+    "fin_ratio": 0.05,
+    "rst_ratio": 0.15,
+    "psh_ratio": 0.05,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.9,
+    "down_up_ratio_std": 0.15,
+    "bidirectional_ratio_mean": 0.9,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.02
+  },
+  "ports": {
+    "pool": [
+      22
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 120,
+    "std": 40
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.04
+  },
+  "phases": [
+    {
+      "name": "brute",
+      "mitre_stage": "initial_access",
+      "technique_id": "T1110.001",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "Calibrated against CIC-IDS2018 SSH-Bruteforce class: high SYN density, elevated RST (failed auth resets), single-port (22) target, small uniform payload sizes."
+}

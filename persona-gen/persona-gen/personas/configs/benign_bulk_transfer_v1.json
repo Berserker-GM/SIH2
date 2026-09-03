@@ -1,0 +1,62 @@
+{
+  "persona_id": "benign_bulk_transfer_v1",
+  "family": "benign",
+  "mitre_technique": null,
+  "adaptive": false,
+  "base_seed": 1002,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 3.0,
+    "jitter_pct": 0.1
+  },
+  "flags": {
+    "syn_ratio": 0.02,
+    "ack_ratio": 0.7,
+    "fin_ratio": 0.05,
+    "rst_ratio": 0.01,
+    "psh_ratio": 0.08,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 0.97,
+    "down_up_ratio_mean": 8.0,
+    "down_up_ratio_std": 1.5,
+    "bidirectional_ratio_mean": 0.3,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.02
+  },
+  "ports": {
+    "pool": [
+      443,
+      22,
+      445
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 1400,
+    "std": 200
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.03,
+    "retransmit_rate": 0.015
+  },
+  "phases": [
+    {
+      "name": "transfer",
+      "mitre_stage": "benign",
+      "technique_id": null,
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.0,
+    "blend_alpha": 0.3
+  },
+  "_notes": "Sustained large-file backup/sync traffic \u2014 few long-lived flows, large packets, strongly download-dominant. Included so the decoder sees a benign class that *also* has high byte volume, so volume alone can't be a shortcut feature."
+}

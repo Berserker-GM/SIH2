@@ -1,0 +1,60 @@
+{
+  "persona_id": "c2_dns_tunnel_v1",
+  "family": "command_and_control",
+  "mitre_technique": "T1071.004",
+  "adaptive": false,
+  "base_seed": 2102,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 0.3,
+    "jitter_pct": 0.15
+  },
+  "flags": {
+    "syn_ratio": 0.02,
+    "ack_ratio": 0.4,
+    "fin_ratio": 0.02,
+    "rst_ratio": 0.01,
+    "psh_ratio": 0.1,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 0.1,
+    "down_up_ratio_mean": 1.1,
+    "down_up_ratio_std": 0.2,
+    "bidirectional_ratio_mean": 0.85,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      53
+    ],
+    "selection": "randomized"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 180,
+    "std": 50
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.0,
+    "retransmit_rate": 0.005
+  },
+  "phases": [
+    {
+      "name": "tunnel",
+      "mitre_stage": "command_and_control",
+      "technique_id": "T1071.004",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.1,
+    "blend_alpha": 0.2
+  },
+  "_notes": "T1071.004 (Application Layer Protocol: DNS) \u2014 C2 tunneled over DNS queries. Almost entirely UDP/port-53, moderate query-response bidirectionality, payload sizes larger than a normal DNS lookup (encoded C2 data in subdomain labels) but still small in absolute terms to stay under typical UDP fragmentation thresholds."
+}

@@ -1,0 +1,60 @@
+{
+  "persona_id": "exfil_c2channel_v1",
+  "family": "exfiltration",
+  "mitre_technique": "T1041",
+  "adaptive": false,
+  "base_seed": 2201,
+  "timing": {
+    "interarrival_dist": "exponential",
+    "lambda": 1.5,
+    "jitter_pct": 0.1
+  },
+  "flags": {
+    "syn_ratio": 0.02,
+    "ack_ratio": 0.6,
+    "fin_ratio": 0.02,
+    "rst_ratio": 0.01,
+    "psh_ratio": 0.2,
+    "urg_ratio": 0.0,
+    "tcp_ratio": 1.0,
+    "down_up_ratio_mean": 0.08,
+    "down_up_ratio_std": 0.03,
+    "bidirectional_ratio_mean": 0.2,
+    "port_scan_score_base": 0.0,
+    "port_scan_score_gain": 0.01
+  },
+  "ports": {
+    "pool": [
+      443
+    ],
+    "selection": "sequential"
+  },
+  "payload": {
+    "size_dist": "lognormal",
+    "mean": 1300,
+    "std": 200
+  },
+  "packet_fields": {
+    "ttl_base": 64,
+    "ttl_jitter": 1,
+    "fragment_rate": 0.02,
+    "retransmit_rate": 0.01
+  },
+  "phases": [
+    {
+      "name": "exfil",
+      "mitre_stage": "exfiltration",
+      "technique_id": "T1041",
+      "dwell_windows": [
+        100000,
+        100000
+      ],
+      "next": null
+    }
+  ],
+  "noise": {
+    "stage_overlap_pct": 0.1,
+    "blend_alpha": 0.2
+  },
+  "_notes": "T1041 (Exfiltration Over C2 Channel) \u2014 sustained, strongly one-directional (uplink-dominant, down_up_ratio_mean ~0.08 i.e. inverted from normal browsing) byte transfer over the same channel used for C2, held on a single port to look like one long-lived legitimate HTTPS session rather than many short flows."
+}
