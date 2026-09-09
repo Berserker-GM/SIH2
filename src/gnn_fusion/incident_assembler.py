@@ -1,5 +1,5 @@
 """
-incident_assembler.py — Dev 3 (Ronit)  [MAIN SERVICE ENTRY POINT]
+incident_assembler.py   [MAIN SERVICE ENTRY POINT]
 
 Subscribes to Redis channel scores:anomaly (ANOMALY_SCORE_OBJECTs from Dev 2).
 For each anomaly flagged (is_anomaly=True), runs GNN inference, assembles
