@@ -1,5 +1,5 @@
 """
-mitre_transitions.py — Dev 3 (Ronit)
+mitre_transitions.py 
 
 Hardcoded MITRE ATT&CK next-step transition matrix for the demo.
 Encodes empirically likely attack progressions observed in real-world campaigns.
