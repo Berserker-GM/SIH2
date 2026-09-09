@@ -1,0 +1,253 @@
+================================================================================
+GITHUB PULL — CHANGE UNDERSTANDING REPORT
+Smart India Hackathon | Normnative (Normative)
+Date: 9 September 2026
+Repo analyzed: https://github.com/Berserker-GM/SIH2
+Local checkout: Normnative-/
+================================================================================
+
+1. HOW THE PULL WAS DONE
+------------------------
+Attempted `git fetch` against the configured remote:
+
+  origin  https://github.com/Berserker-GM/SIH.git
+
+That remote returns **404 / Repository not found**. The live team repo is:
+
+  https://github.com/Berserker-GM/SIH2
+
+Fetched successfully as a second remote (`sih2`) and inspected:
+
+  sih2/main                         @ e36c0b0
+  sih2/feat/persona-v2-world-model  @ 9971f09  (merged via PR #1)
+
+Local `main` and `sih2/main` have **unrelated / diverged histories**
+(local still tracks the old SIH lineage; SIH2 was re-seeded). A blind
+`git merge` would be messy. Instead, the new content was checked out from
+`sih2/main` into the working tree:
+
+  persona-gen/
+  reports/
+  README2.md
+  dataset_manifest.json
+  divergence_report.csv
+  mitre_notes.md
+
+**Action still needed (manual):** point `origin` at SIH2 when ready, then
+reconcile history (rebase / fresh clone / allow-unrelated merge). Until
+then, use `git fetch sih2` for updates.
+
+Local was already ahead of the *old* origin by commit
+`47ee6d5 change and creation of world model` (world-model prototype).
+
+
+2. WHAT LANDED ON GITHUB (chronological)
+----------------------------------------
+From oldest meaningful SIH2 commits to HEAD of `main`:
+
+  5012c3a  Add the Normnative world-model prototype and evaluation reports
+           at the repository root.
+           Author: Galabavamsi | 2026-08-26
+           Why: seed SIH2 with the CIC LSTM world-model, dashboard, docs,
+           and root-level evaluation reports.
+
+  9971f09  Add persona ingest and a v2 world-model checkpoint that leaves
+           v1 CIC weights frozen.
+           Author: Galabavamsi | 2026-08-28
+           Why: plug synthetic personas into the frozen pipeline without
+           overwriting quoted v1 numbers (`world_lstm.pt` / `scaler.npz`).
+
+  ddd30ea  Merge pull request #1 (feat/persona-v2-world-model)
+           Author: Berserker-GM | 2026-09-01
+           Why: land the persona/v2 work on main.
+
+  2f67454  personas pipeline added and readme refined
+           Author: Nimish-Sharma-dev | 2026-09-09
+           Why: ship the full 20-agent synthetic generator (`persona-gen/`),
+           production CSVs, adaptation logs, divergence check, MITRE notes.
+
+  e143549  edited persona and readme
+           Author: Nimish-Sharma-dev | 2026-09-09
+           Why: expand runs (esp. C2 / evasive) to `run_000`… naming that
+           matches the pipeline TRAIN/VAL/TEST-by-run split; refresh
+           README2.md, dataset_manifest.json, divergence_report.csv.
+
+  b534837 / 7e376cd / a8dd97e / 5728942 / e36c0b0
+           Clean up GNN fusion module headers (remove per-dev banner text)
+           in gnn_model, graph_builder, incident_assembler, mitre_transitions,
+           risk_scorer.
+           Author: Berserker-GM | 2026-09-09
+           Why: housekeeping only — no behaviour change.
+
+
+3. WHAT EACH MAJOR CHANGE DOES
+------------------------------
+
+3.1 World-model prototype (already known locally; published to SIH2)
+  Path: src/world_model/*, frontend ForecastDashboard, reports/*.txt
+
+  What: 5s × 32-d state S_t → 2-layer LSTM (hidden 64) → K=6 closed-loop
+        rollout → MITRE LogReg decoder → why_* explainability → FastAPI
+        :8001 + live CSV dashboard.
+
+  Why:  SIH asks for a predictive network *world model*, not a static
+        flow classifier. CIC-IDS2018 supplies real labelled days; the
+        frozen architecture + train-only scaler keep quoted metrics honest.
+
+3.2 Persona ingest + v2 checkpoint (PR #1)
+  Path: src/world_model/personas.py, eval_v2.py, train --tag v2,
+        world_lstm_v2.pt, scaler_v2.npz, stage_decoder_v2.joblib,
+        score_history() in service.py
+
+  What:
+    - load_persona_csv: already-windowed 32-d rows → same NPZ pair format
+      as CIC (source="synthetic", day_id=syn:{persona}:{run}).
+    - v2 weights trained on CIC + fixtures; v1 untouched.
+    - score_history(x, model_version="v1"|"v2"): in-process scorer for
+      adaptive hill-climb (no HTTP).
+
+  Why:  CIC has zero training support for recon / C2 / exfiltration.
+        Synthetic personas fill those stages. Freezing v1 preserves the
+        01 Mar quoted results. score_history is a hard dependency for
+        evasive personas.
+
+  Honest result already reported: with only ~39 fixture windows per rare
+  class, real 02 Mar C2 recall stayed 0.000 (and fixture C2 also 0.000).
+  That finding drives the next drop.
+
+3.3 persona-gen — 20-agent synthetic suite (the big new piece)
+  Path: persona-gen/persona-gen/
+
+  What it is:
+    Deterministic (no LLM) traffic generator that emits **pre-aggregated**
+    5-second, 32-feature CSV rows matching the shared pipeline contract
+    (METADATA + STATE_FEATURE_ORDER). She is the aggregator; the world
+    model only validates, scales, and trains.
+
+  Modules and roles:
+    schema.py        Shared CSV_COLUMNS + MITRE_STAGES (contract lock).
+    config_io.py     Load/validate persona JSON (fill defaults).
+    sampler.py       Sample one 32-d window from phase knobs.
+    engine.py        Phase state machine (probe→brute→…) + CSV writer;
+                     fresh run_id every generate_run() call.
+    adaptive.py      (1+1) hill-climb: perturb θ → regenerate → score
+                     last 8 windows → accept only if P(attack) drops AND
+                     kill-chain phase still reached (hard constraint).
+    score_stub.py    Placeholder scorer; adaptive.py prefers real
+                     score_history() when importable.
+    build_configs.py Writes all 20 persona JSON configs.
+    run_all.py       Generate CSVs for all/one persona.
+    run_adaptive.py  Hill-climb the 3 evasive personas.
+    produce_dataset.py  Production mass build sized to fix the C2 gap.
+    validate.py      Divergence vs reference_stats → divergence_report.csv.
+    generate_mitre_notes.py  Docs for MITRE-derived personas.
+
+  20 personas (3 tiers):
+
+    Tier 1 — dataset-calibrated (CIC already has these families)
+      benign_browsing_v1, benign_bulk_transfer_v1, benign_iot_idle_v1
+      bruteforce_ssh_v1, bruteforce_ftp_v1, web_bruteforce_v1
+      web_sql_injection_v1, web_xss_v1
+      dos_hulk_v1, dos_slowloris_v1
+      infiltration_v1, lateral_movement_smb_v1
+      Plan: 3 runs × 720 windows
+
+    Tier 2 — MITRE-doc-based (CIC has no / rare support)
+      recon_portscan_v1, recon_service_discovery_v1
+      c2_beacon_v1, c2_dns_tunnel_v1
+      exfil_c2channel_v1
+      Plan: 8 runs × 200 windows  ← mass fix for C2/recon/exfil
+
+    Tier 3 — adaptive / evasive (hill-climb)
+      evasive_recon_v1, evasive_c2_v1, evasive_lateral_v1
+      Plan: 5 runs × 300 windows
+
+  Production synthetic mass (dataset_manifest.json):
+    total windows     38,420
+    benign             6,480
+    initial_access    10,800
+    lateral_movement   5,442
+    reconnaissance     5,078
+    command_and_control 4,700
+    impact             4,320
+    exfiltration       1,600
+
+  Why it exists:
+    - Fill MITRE stages CIC cannot teach (recon / C2 / exfil).
+    - Keep schema plug-and-play with the world-model ingest path.
+    - Give evasive agents a closed loop against score_history without
+      FastAPI latency.
+    - Respond to v2's finding that **mass**, not just signature, was
+      blocking C2 transfer (39 windows → now thousands).
+
+  Design rules that matter for the pipeline:
+    - Column order locked to FEATURE_COLUMNS == STATE_FEATURE_ORDER.
+    - mitre_stage is a STAGE_NAMES string (no CIC Label mapping).
+    - Dims 29–31 (ttl_variance, ip_fragment_flags, retransmit_count)
+      are real sampled values, not stubs.
+    - Each (persona_id, run_id) is one synthetic "day"; never glue runs.
+    - Noise blend (stage_overlap_pct) toward benign so rare classes are
+      not trivially separable.
+    - Adaptive acceptance requires kill-chain progress (silence ≠ evasion).
+    - Bulk output goes to data/raw/personas/, never POST /upload.
+
+3.4 GNN fusion header cleanups
+  Path: src/gnn_fusion/*.py
+  What: comment / header only.
+  Why: remove stale "Dev 3 (Ronit)" banners; no runtime impact.
+
+
+4. WHY THIS MATTERS FOR THE SIH DEMO
+------------------------------------
+Problem statement asks for evolving network state, 30s forecast, MITRE
+stages, and explainability on open public data. CIC alone cannot cover
+recon/C2/exfil. The persona suite + v2 ingest path is how the team adds
+those stages without breaking the frozen LSTM discipline.
+
+Immediate next pipeline step (still open after this pull):
+
+  1. Copy / symlink persona-gen CSVs into data/raw/personas/
+     (or point --personas-dir at the generator output).
+  2. Rebuild combined NPZ (without --write-persona-fixtures so real
+     generator CSVs win over 7-stage stubs).
+  3. Retrain: python -m src.world_model.train ... --tag v2
+  4. Eval: python -m src.world_model.eval_v2 ...
+  5. Re-run run_adaptive.py so logs tag "_scorer": "real:score_history".
+  6. Watch why_stage for TTL-only shortcuts on evasive personas.
+
+
+5. FILES / FOLDERS TO KNOW
+--------------------------
+  persona-gen/persona-gen/          Generator source + 20 configs + CSVs
+  dataset_manifest.json             Window counts / train-val-test by run
+  divergence_report.csv             Generated vs reference z-scores
+  mitre_notes.md / README2.md       Persona reasoning + operator docs
+  reports/                          Existing world-model evaluation reports
+                                    (this file lives here too)
+  src/world_model/personas.py       Ingest contract on the ML side
+  src/world_model/service.py        score_history() for adaptive loop
+  src/world_model/models/*_v2.*     Frozen-architecture v2 artifacts
+
+
+6. REMOTE HYGIENE NOTES
+-----------------------
+  - Do not fetch from Berserker-GM/SIH (dead).
+  - Use Berserker-GM/SIH2.
+  - Local origin URL was left unchanged in this session (remote rewrite
+    needs an explicit OK). Recommended:
+      git remote set-url origin https://github.com/Berserker-GM/SIH2.git
+  - After that, reconcile divergent histories before treating local main
+    as identical to GitHub main.
+
+
+7. SOURCES
+----------
+  - Remote: https://github.com/Berserker-GM/SIH2
+  - Branch: main @ e36c0b0; PR #1 feat/persona-v2-world-model
+  - Local inspected paths: persona-gen/persona-gen/README.md,
+    produce_dataset.py, adaptive.py, engine.py, schema.py,
+    dataset_manifest.json, mitre_notes.md, git log sih2/main
+
+================================================================================
+END OF REPORT
+================================================================================

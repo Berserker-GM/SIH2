@@ -30,8 +30,9 @@ _ISO_DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _DMY = re.compile(r"(\d{2})-(\d{2})-(\d{4})")
 
 # syn:{persona_id}:{run_id}  — one synthetic run == one calendar "day"
+# U128: long persona+run ids (e.g. recon_service_discovery_v1__run_000) exceed U64.
 SYNTH_DAY_PREFIX = "syn:"
-DAY_ID_DTYPE = "U64"
+DAY_ID_DTYPE = "U128"
 SOURCE_DTYPE = "U16"
 
 _STACK_KEYS = (
