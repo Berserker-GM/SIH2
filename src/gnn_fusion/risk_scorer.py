@@ -1,5 +1,5 @@
 """
-risk_scorer.py — Dev 3 (Ronit)
+risk_scorer.py
 
 Risk scoring functions that fuse outputs from Dev 2 (ML anomaly scores),
 the GNN (graph classification confidence), and Dev 1 (MITRE severity weights).
