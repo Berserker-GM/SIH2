@@ -1,5 +1,5 @@
 """
-gnn_model.py — Dev 3 (Ronit)
+gnn_model.py
 
 NormativeGNN: GraphSAGE + GAT hybrid that operates on subgraphs around
 suspicious nodes flagged by Dev 2.
