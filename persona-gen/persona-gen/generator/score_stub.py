@@ -79,4 +79,13 @@ def score_history(x: np.ndarray, model_version: str = "v2") -> dict:
         "stage": stage,
         "technique_id": technique,
         "why_attack_top_features": why,
+        # Extra fields present on the real score_history() per the pipeline dev's v2 report.
+        # Not meaningfully computed here — placeholders only, kept so calling code written
+        # against the real signature doesn't break when running against this stub.
+        "ood_score": None,
+        "ood_flag": False,
+        "ood_threshold": 6.0,
+        "why_stage": [],
+        "why_change": [],
+        "narrative": None,
     }

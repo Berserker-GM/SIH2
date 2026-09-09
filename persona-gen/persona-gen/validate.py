@@ -32,11 +32,11 @@ DATASET_CALIBRATED_PERSONAS = {
 }
 
 
-def latest_csv_for(persona_id, data_root="data/raw/personas"):
+def load_all_runs_for(persona_id, data_root="data/raw/personas"):
     d = Path(data_root) / persona_id
-    files = sorted(d.glob("*.csv"), key=lambda p: p.stat().st_mtime)
-    assert files, f"no generated CSV found for {persona_id} — run run_all.py first"
-    return files[-1]
+    files = sorted(d.glob("*.csv"))
+    assert files, f"no generated CSV found for {persona_id} — run produce_dataset.py first"
+    return pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
 
 
 def main():
@@ -52,8 +52,7 @@ def main():
         family = cfg["phases"][0]["mitre_stage"]
         if family not in ref:
             continue
-        csv_path = latest_csv_for(pid)
-        df = pd.read_csv(csv_path)
+        df = load_all_runs_for(pid)
 
         for feat in KEY_FEATURES:
             gen_mean = df[feat].mean()

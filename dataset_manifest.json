@@ -1,0 +1,485 @@
+{
+  "personas": [
+    {
+      "persona_id": "benign_browsing_v1",
+      "family": "benign",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "benign": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "benign_bulk_transfer_v1",
+      "family": "benign",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "benign": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "benign_iot_idle_v1",
+      "family": "benign",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "benign": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "bruteforce_ftp_v1",
+      "family": "initial_access",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "initial_access": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "bruteforce_ssh_v1",
+      "family": "initial_access",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "initial_access": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "c2_beacon_v1",
+      "family": "command_and_control",
+      "adaptive": false,
+      "runs": 8,
+      "windows_per_run": 200,
+      "total_windows": 1600,
+      "stage_breakdown": {
+        "command_and_control": 1600
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004",
+          "run_005",
+          "run_006",
+          "run_007"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "c2_dns_tunnel_v1",
+      "family": "command_and_control",
+      "adaptive": false,
+      "runs": 8,
+      "windows_per_run": 200,
+      "total_windows": 1600,
+      "stage_breakdown": {
+        "command_and_control": 1600
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004",
+          "run_005",
+          "run_006",
+          "run_007"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "dos_hulk_v1",
+      "family": "impact",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "impact": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "dos_slowloris_v1",
+      "family": "impact",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "impact": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "evasive_c2_v1",
+      "family": "command_and_control",
+      "adaptive": true,
+      "runs": 5,
+      "windows_per_run": 300,
+      "total_windows": 1500,
+      "stage_breakdown": {
+        "command_and_control": 1500
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "evasive_lateral_v1",
+      "family": "lateral_movement",
+      "adaptive": true,
+      "runs": 5,
+      "windows_per_run": 300,
+      "total_windows": 1500,
+      "stage_breakdown": {
+        "reconnaissance": 378,
+        "lateral_movement": 1122
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "evasive_recon_v1",
+      "family": "reconnaissance",
+      "adaptive": true,
+      "runs": 5,
+      "windows_per_run": 300,
+      "total_windows": 1500,
+      "stage_breakdown": {
+        "reconnaissance": 1500
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "exfil_c2channel_v1",
+      "family": "exfiltration",
+      "adaptive": false,
+      "runs": 8,
+      "windows_per_run": 200,
+      "total_windows": 1600,
+      "stage_breakdown": {
+        "exfiltration": 1600
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004",
+          "run_005",
+          "run_006",
+          "run_007"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "infiltration_v1",
+      "family": "lateral_movement",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "lateral_movement": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "lateral_movement_smb_v1",
+      "family": "lateral_movement",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "lateral_movement": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "recon_portscan_v1",
+      "family": "reconnaissance",
+      "adaptive": false,
+      "runs": 8,
+      "windows_per_run": 200,
+      "total_windows": 1600,
+      "stage_breakdown": {
+        "reconnaissance": 1600
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004",
+          "run_005",
+          "run_006",
+          "run_007"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "recon_service_discovery_v1",
+      "family": "reconnaissance",
+      "adaptive": false,
+      "runs": 8,
+      "windows_per_run": 200,
+      "total_windows": 1600,
+      "stage_breakdown": {
+        "reconnaissance": 1600
+      },
+      "split": {
+        "train": [
+          "run_000",
+          "run_003",
+          "run_004",
+          "run_005",
+          "run_006",
+          "run_007"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "web_bruteforce_v1",
+      "family": "initial_access",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "initial_access": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "web_sql_injection_v1",
+      "family": "initial_access",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "initial_access": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    },
+    {
+      "persona_id": "web_xss_v1",
+      "family": "initial_access",
+      "adaptive": false,
+      "runs": 3,
+      "windows_per_run": 720,
+      "total_windows": 2160,
+      "stage_breakdown": {
+        "initial_access": 2160
+      },
+      "split": {
+        "train": [
+          "run_000"
+        ],
+        "val": [
+          "run_001"
+        ],
+        "test": [
+          "run_002"
+        ]
+      }
+    }
+  ],
+  "stage_totals": {
+    "benign": 6480,
+    "initial_access": 10800,
+    "command_and_control": 4700,
+    "impact": 4320,
+    "reconnaissance": 5078,
+    "lateral_movement": 5442,
+    "exfiltration": 1600
+  }
+}

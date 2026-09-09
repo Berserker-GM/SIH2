@@ -26,7 +26,22 @@ import numpy as np
 
 from .engine import generate_run
 from .schema import FEATURE_COLUMNS, SCORE_HISTORY_WINDOWS
-from .score_stub import score_history  # PLACEHOLDER — replace with pipeline dev's real function
+
+# Real scorer, confirmed shipped in the pipeline dev's v2 report:
+#   from src.world_model.service import score_history
+#   out = score_history(x, model_version="v2")  # x: (8,32) unscaled, STATE_FEATURE_ORDER, most recent last
+# Signature matches what this file was built against, plus extra fields we
+# don't currently use (ood_score, ood_flag, ood_threshold, why_stage,
+# why_change, narrative). Falls back to the local placeholder mock only if
+# the real module isn't importable yet (e.g. running this repo standalone,
+# outside the merged pipeline tree) — once merged, the real import below
+# will shadow it automatically and nothing else in this file needs to change.
+try:
+    from src.world_model.service import score_history  # type: ignore
+    _USING_REAL_SCORER = True
+except ImportError:
+    from .score_stub import score_history  # PLACEHOLDER fallback — see score_stub.py docstring
+    _USING_REAL_SCORER = False
 
 META_KEYS = {"kill_chain_target_phase", "step_budget_windows"}
 
@@ -96,6 +111,9 @@ def _score_batch(cfg, run_id, seed_offset, budget_windows, target_phase):
 
 def run_hill_climb(cfg: dict, cycles: int = 15, log_dir: str = "personas/adaptation_logs"):
     assert cfg["adaptive"], f"{cfg['persona_id']} is not marked adaptive"
+    if not _USING_REAL_SCORER:
+        print(f"  [warn] {cfg['persona_id']}: real score_history not importable here, "
+              f"using local placeholder mock (see generator/score_stub.py)")
     search_space = cfg["search_space"]
     target_phase = search_space["kill_chain_target_phase"]
     budget = int(search_space["step_budget_windows"])
@@ -146,6 +164,7 @@ def run_hill_climb(cfg: dict, cycles: int = 15, log_dir: str = "personas/adaptat
 
     with open(log_path, "w") as f:
         for entry in log_entries:
+            entry["_scorer"] = "real:score_history" if _USING_REAL_SCORER else "placeholder:score_stub"
             f.write(json.dumps(entry) + "\n")
 
     return {

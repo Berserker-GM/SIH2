@@ -55,40 +55,114 @@ docs/divergence_report.csv       # validate.py output
 ## Status against the acceptance criteria
 
 - [x] ~20 persona configs following the shared JSON schema exactly (20 written by `build_configs.py`)
-- [x] Generator produces CSVs matching the shared 32-column schema exactly, column order included
-      (`generator/schema.py::CSV_COLUMNS` is asserted against on every write; verified against a
-      generated file — header equality checked directly)
-- [x] Recon/C2/exfil personas documented with MITRE technique ID + reasoning (`docs/mitre_notes.md`,
-      also inline as `_notes` in each config)
+- [x] Generator produces CSVs matching the shared 32-column schema exactly, column order included —
+      confirmed against the pipeline dev's v2 report: `STATE_FEATURE_ORDER` in `cic_schema.py`
+      matches this repo's `CSV_COLUMNS[5:]` with no mismatch to reconcile.
+- [x] Recon/C2/exfil personas documented with MITRE technique ID + reasoning (`docs/mitre_notes.md`)
 - [x] 2–3 adaptive personas with hill-climbing cycle logs showing attack-probability-over-cycles,
       kill-chain progression preserved (3 personas, 20 cycles each, hard kill-chain constraint
-      enforced and verified on every accepted step — see `personas/adaptation_logs/`)
-- [x] One-time divergence check vs reference stats for dataset-calibrated personas (`validate.py`,
-      mechanism fully built and tested)
-- [ ] **Confirmed `score_history()` signature with the pipeline dev before building the adaptive
-      loop against it — NOT YET DONE.** This is a hard dependency called out explicitly in the
-      brief and I haven't had that conversation. Everything above runs today against
-      `generator/score_stub.py`, a local mock with the *documented* signature
-      (`x: shape (8,32) -> {attack_probability, something_bad, stage, technique_id,
-      why_attack_top_features}`), clearly marked as a placeholder in its own docstring. The
-      **only** change needed once the real function ships is the import line at the top of
-      `generator/adaptive.py`. Do not treat `score_stub.py`'s attack-probability numbers as
-      meaningful outside this repo — its weights are illustrative, not calibrated against the
-      real LSTM.
+      enforced and verified on every accepted step)
+- [x] One-time divergence check vs reference stats for dataset-calibrated personas (`validate.py`)
+- [x] `score_history()` signature confirmed — pipeline dev's v2 report ships it in
+      `src/world_model/service.py`, real (not HTTP), in-process, matching the documented shape
+      plus extra fields (`ood_score`, `ood_flag`, `ood_threshold`, `why_stage`, `why_change`,
+      `narrative`). `generator/adaptive.py` now imports the real function first and only falls
+      back to the local `score_stub.py` mock if that import fails (i.e. when this repo is run
+      standalone, outside the merged pipeline tree — which is the case in this sandbox, hence
+      the `[warn]` lines when you run `run_adaptive.py` here). **No further code change needed
+      on merge** — once this repo sits inside the pipeline tree, the real import wins
+      automatically and every hill-climbing log gets tagged `"_scorer": "real:score_history"`
+      instead of `"placeholder:score_stub"`, so old stub-scored logs can never be mistaken for
+      real-model results later.
 
-## Known placeholders that need real numbers before this is demo-final
+## What's next (post-merge) — priority order
 
-1. **`personas/reference_stats.json`** — the per-family mean/std used by `validate.py` are
-   illustrative placeholders, not pulled from the pipeline dev's actual CIC-IDS2018 training
-   report. The brief is explicit that these should come from asking the pipeline dev rather than
-   re-deriving them. Swap this file's contents once you have those numbers; `validate.py`'s
-   z-score mechanism itself needs no changes. Current run already surfaces one useful finding
-   worth knowing about regardless: **`dest_port_entropy` and `pkt_len_mean` vary a lot within the
-   `initial_access` family** (raw SSH/FTP brute force vs. web-form brute force vs. SQLi/XSS look
-   very different on those two features) — a single family-level reference bucket is probably too
-   coarse; you likely want per-CICIDS-subclass reference stats, not one bucket per `mitre_stage`.
-2. **`generator/score_stub.py`** — replace with the real `score_history()` import once confirmed
-   (see above).
+The pipeline dev's v2 report changes what "done" means here. The original blocker
+(confirm `score_history()`) is resolved; the report's own findings point at the next
+real problem:
+
+1. **Mass, not signature, is what's blocking C2/recon/exfil.** Their v2 was trained on 39
+   fixture windows per class for recon/C2/exfiltration. Real 02 Mar C2 recall was 0.000, and —
+   more tellingly — recall was *also* 0.000 on held-out **fixture** C2, meaning 39 windows isn't
+   enough signal at any distribution, real or synthetic. `produce_dataset.py` (new in this drop)
+   fixes this directly: recon/C2/exfil personas now get 8 runs × 200 windows = ~1,600 windows
+   each (5,078 recon / 4,700 C2 / 1,600 exfiltration windows in aggregate — see
+   `docs/dataset_manifest.json`), landing in the same order of magnitude as the smallest real
+   CIC class (impact: 1,305 windows) instead of 39. **This needs an actual retrain + eval cycle
+   I can't run from this sandbox** — it depends on their `prepare_dataset.py` / `train.py`
+   (section 11 of their report):
+   ```
+   python -m src.world_model.prepare_dataset --cic-npz data/processed/state_windows_multiday.npz \
+     --personas-dir data/raw/personas --write-persona-fixtures \
+     --out data/processed/state_windows_combined.npz
+   python -m src.world_model.train --npz data/processed/state_windows_combined.npz --tag v2
+   python -m src.world_model.eval_v2 --npz-v1 data/processed/state_windows_multiday.npz \
+     --npz-v2 data/processed/state_windows_combined.npz
+   ```
+   Drop `data/raw/personas/` from this repo in place of the fixture directory first.
+
+2. **Confirm `mitre_stage` strings match `STAGE_NAMES` in `labels.py` exactly.** Their report
+   says lookup is direct, no CIC Label mapping — so a silent string mismatch (e.g. casing,
+   underscores) would fail quietly rather than error loudly. This repo emits exactly:
+   `benign, reconnaissance, initial_access, lateral_movement, command_and_control, exfiltration,
+   impact` (see `generator/schema.py::MITRE_STAGES`). Worth a direct diff against their
+   `labels.py` before the next retrain, not an assumption.
+
+3. **Watch the TTL-shortcut risk they flagged.** Their `why_stage`/`why_change` output already
+   cites `ttl_variance` / `ip_fragment_flags` / `retransmit_count` on the evasive_lateral fixture
+   — their report explicitly calls this "a generator knob: if her evasive personas only jitter
+   TTL, the stage head will key on it." `evasive_lateral_v1`'s hill-climbing search space here
+   varies `packet_fields.fragment_rate` alongside `timing.lambda` and
+   `flags.port_scan_score_gain` (3 dims, not TTL alone) — but this is exactly the kind of thing
+   that's easy to get subtly wrong and only shows up in saliency output after a real retrain.
+   Worth re-checking `why_stage` output on the new (non-fixture) evasive personas once v2 is
+   retrained on this drop, not assuming the 3-dim search space already fixed it.
+
+4. **Re-run `run_adaptive.py` against the real scorer once merged.** Every result in
+   `personas/adaptation_logs/` right now is scored by the local placeholder mock (tagged
+   `"_scorer": "placeholder:score_stub"` in every log entry) — its weights are illustrative, not
+   the real LSTM's. The loop itself (perturb → regenerate → common-random-numbers rescoring →
+   accept/revert with the kill-chain hard constraint) doesn't need to change; only the scorer
+   swaps automatically on merge (see above). Numbers will very likely differ once real
+   `attack_probability` replaces the mock's logistic — that's expected, re-run and take the new
+   numbers, don't average the two.
+
+5. **`personas/reference_stats.json` is still placeholder**, not real CIC-IDS2018 per-class
+   stats — unrelated to the v2 report, still open from before. The check already surfaced that a
+   single `initial_access` bucket is too coarse (web attacks vs. raw brute force diverge on
+   `dest_port_entropy` and `pkt_len_mean`, z-scores 2–3.4) — worth splitting the reference buckets
+   before trusting `validate.py`'s flags, once real numbers are available.
+
+## Confirmed compatible, no action needed
+
+- **Schema**: `STATE_FEATURE_ORDER` == this repo's `FEATURE_COLUMNS`, same order, per their report.
+- **Run/day discipline**: "each `(persona_id, run_id)` is one synthetic day, sequences never cross
+  a run" — matches `engine.generate_run()`'s fresh-`run_id`-per-call design exactly.
+- **Dims 29–31 (`ttl_variance`, `ip_fragment_flags`, `retransmit_count`) are real, not stubbed** —
+  their report notes v1's scaler had these at std=1.0 (floor, all-zero real data) and v2 now sees
+  real variance (0.36 / 0.13 / 0.30) from this generator's `packet_fields` sampling. No change needed.
+- **Never used the upload API** — their report says bulk persona data must not go through
+  `POST /upload`; this repo only ever writes directly to `data/raw/personas/<persona_id>/<run_id>.csv`.
+- **Run-id naming now matches their split convention**: `run_all.py` / `produce_dataset.py` name
+  runs `<persona_id>__run_000`, `__run_001`, `__run_002`, ... so their TRAIN/VAL/TEST-by-run_id
+  split (run_000/001/002) applies directly without renaming.
+
+## Production dataset (this drop)
+
+Generated by `produce_dataset.py`, sized per the reasoning in item 1 above. Full breakdown in
+`docs/dataset_manifest.json`; aggregate windows per `mitre_stage` (synthetic side only):
+
+```
+initial_access     10,800
+benign               6,480
+lateral_movement     5,442
+reconnaissance       5,078
+command_and_control  4,700
+impact               4,320
+exfiltration         1,600
+```
+
+Regenerate with `python3 produce_dataset.py --clean`.
 
 ## Design notes
 
