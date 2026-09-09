@@ -1,0 +1,299 @@
+================================================================================
+LSTM WORLD MODEL — REAL PERSONA DROP + V2 RETRAIN REPORT
+Smart India Hackathon | Normnative (Normative)
+Date: 9 September 2026
+Scope: Replace 7-stage schema fixtures with the full persona-gen production
+       CSV drop; rebuild combined NPZ; retrain/eval v2; verify real
+       score_history in the adaptive loop.
+Related prior reports:
+  reports/GitHub_Pull_Change_Understanding_Report.txt
+  reports/LSTM_World_Model_Training_Report.txt
+  (earlier fixture-only persona v2 pass — mass too small for C2 transfer)
+================================================================================
+
+1. PURPOSE
+----------
+Close the open pipeline after the SIH2 persona-gen pull:
+
+  1. Use the later generator drop (run_000/001/… multi-run, sized mass),
+     not the stale first drop (one hash CSV per persona).
+  2. Wire that drop into prepare_dataset / train / eval without writing
+     7-stage fixtures over it.
+  3. Confirm adaptive.py hits real score_history (not the placeholder).
+  4. Watch why_stage for TTL-only shortcuts on evasive personas.
+
+This report records what changed, what was measured, and what remains open.
+
+
+2. PROBLEMS FOUND IN THE CHECKED-OUT DROP
+-----------------------------------------
+Persona-dev flagged two structural issues; both were confirmed locally.
+
+  (A) Stale CSV drop
+      persona-gen/persona-gen/data/raw/personas/* initially had one
+      <persona_id>__<hash>.csv per persona (first drop). That lacked
+      run_000/001/002 structure and under-sized recon/C2/exfil
+      (~200–700 windows vs ~1,600 intended).
+
+  (B) Nested / disconnected from default ingest
+      Generator output lives at:
+        persona-gen/persona-gen/data/raw/personas/
+      Pipeline default is still:
+        data/raw/personas/   (7-stage fixtures: benign_office_v1, …)
+      Without --personas-dir (or a replace), prepare_dataset never sees
+      the generator. Running adaptive from inside the nested folder
+      without PYTHONPATH=<repo root> silently falls back to
+      generator/score_stub.py.
+
+
+3. CONTRACT VERIFICATION (NOT GUESSED)
+--------------------------------------
+Compared generator schema against world-model contracts:
+
+  FEATURE_COLUMNS  ==  STATE_FEATURE_ORDER     (exact match)
+  MITRE_STAGES     ==  STAGE_NAMES             (exact match)
+
+CLI / runtime:
+
+  --personas-dir     accepts any path relative to repo root
+                     (default remains data/raw/personas)
+  --write-persona-fixtures
+                     writes 7-stage stubs ONLY if that personas dir
+                     currently has no CSVs. Omit when real generator
+                     data is present — otherwise stubs never fire.
+  score_history(x, model_version="v2")
+                     returns attack_probability, something_bad, stage,
+                     technique_id, why_attack_top_features, why_stage,
+                     why_change, ood_* fields.
+  train --tag v2     writes world_lstm_v2.pt / scaler_v2.npz /
+                     stage_decoder_v2.joblib / metrics_v2.json
+                     and refuses to overwrite v1 without --overwrite.
+  conftest.py        adds src/ subdirs to path, NOT repo root —
+                     adaptive needs PYTHONPATH=<repo root> for
+                     `from src.world_model.service import score_history`.
+  .env.example       Redis/API ports only — not required for train.
+
+
+4. CODE CHANGE THIS PASS
+------------------------
+File: src/world_model/dataset.py
+
+  DAY_ID_DTYPE  "U64"  →  "U128"
+
+Reason: synthetic day ids are `syn:{persona_id}:{run_id}` and
+produce_dataset sets run_id = "{pid}__run_{idx:03d}". For
+recon_service_discovery_v1 that string is 66 characters; U64
+truncated to `…__run_0`, collapsing all eight runs into one day id
+and breaking train/val/test-by-run splits. After the bump, all
+eight run ids remain distinct.
+
+No change to model.py, STATE_FEATURE_ORDER, or STAGE_NAMES.
+
+
+5. PIPELINE EXECUTED (EXACT SEQUENCE)
+-------------------------------------
+Repo root: Normnative-/
+
+  # (1) Regenerate production drop in place
+  cd persona-gen/persona-gen
+  python produce_dataset.py --clean
+  → 91 CSVs under data/raw/personas/  (run_000… naming, full mass)
+
+  # (2) Smoke
+  cd <repo root>
+  python -m pytest tests/test_world_model_personas.py -v
+  → 37/37 PASS
+
+  # (3) Combined NPZ — NO --write-persona-fixtures
+  python -m src.world_model.prepare_dataset \
+    --cic-npz data/processed/state_windows_multiday.npz \
+    --personas-dir persona-gen/persona-gen/data/raw/personas \
+    --out data/processed/state_windows_combined.npz
+  → pairs=86212  (CIC + 38329 synthetic)
+  → attack_now≈0.510  attack_within_k≈0.529
+
+  # (4) Retrain v2 (v1 artifacts untouched)
+  python -m src.world_model.train \
+    --npz data/processed/state_windows_combined.npz --tag v2
+  → early stop epoch 16/40  (device=cpu)
+  → saved world_lstm_v2.pt, scaler_v2.npz, stage_decoder_v2.joblib,
+     metrics_v2.json
+
+  # (5) Eval
+  python -m src.world_model.eval_v2 \
+    --npz-v1 data/processed/state_windows_multiday.npz \
+    --npz-v2 data/processed/state_windows_combined.npz
+  → saved src/world_model/models/v2_metrics.json
+
+  # (6) Adaptive against real scorer
+  #    Must run from nested dir so personas/configs resolves;
+  #    PYTHONPATH must be repo root so the import wins.
+  cd persona-gen/persona-gen
+  set PYTHONPATH=<repo root>
+  python run_adaptive.py --cycles 20
+  → no [warn] … placeholder mock lines
+  → all log entries "_scorer": "real:score_history"
+
+
+6. SPLIT BEHAVIOUR (SYNTHETIC)
+------------------------------
+split_synthetic_days (per persona, sorted by run_id):
+
+  1 run  → train
+  2 runs → train, test
+  3+     → all but last two train; second-last val; last test
+
+Examples after this drop:
+
+  3-run personas (e.g. web_*, bruteforce_*):
+    train=run_000  val=run_001  test=run_002
+
+  8-run C2/recon (c2_beacon, c2_dns_tunnel, recon_*, exfil_*):
+    train=run_000…005  val=run_006  test=run_007
+
+Train this pass: 44629 pairs / 44128 sequences
+Val:             17187 / 17033
+Test:            24396 / 24038
+seq_len=8; rejected_day=679 rejected_gap=313
+
+
+7. TRAIN METRICS (COMBINED TEST)
+--------------------------------
+Attack-within-K (val-chosen thr; dashboard still uses 0.15 alert thr):
+
+  LSTM     F1=0.796  P=0.987  R=0.667  FPR=0.015  acc=0.789
+  LogReg   F1=0.734  P=0.955  R=0.597  FPR=0.045  acc=0.734
+  → LSTM F1 vs LogReg: WIN
+
+Next-state dynamics (scaled):
+
+  LSTM     MSE=38.72  MAE=0.434  RMSE=6.22
+  Persist  MSE=8.47   MAE=0.289  RMSE=2.91
+  → LSTM MSE vs persist: LOSE  (ΔMSE reduction −3.57)
+
+Held-out synthetic attack runs (examples): perfect LSTM F1 on
+c2_beacon run_007, recon_portscan run_007, exfil run_007, evasive_*,
+bruteforce_*, dos_*, etc. Benign held-outs correctly stay F1=0 with
+FPR=0 for LSTM.
+
+
+8. EVAL_V2 BENCHMARK (QUOTE PER-ROW)
+------------------------------------
+Do not pool 21 Feb with 01 Mar. Numbers from v2_metrics.json:
+
+slice                                      ver        n      MSE   ΔMSE  MITRE_acc   mF1   C2_R
+real test days (quoted v1 scaler)          v1     13618   43.57  -0.65     0.564  0.225    n/a
+real test days (combined scaler, v1 wts)   v1+r   13618   67.19  -0.62      n/a    n/a    n/a
+real 01 Mar infiltration                   v1      6726    0.65  +0.41      n/a    n/a    n/a
+real 02 Mar C2                             v1      6260    0.54  +0.00     0.345  0.075  0.000
+real test days                             v2     13618   67.47  -0.62     0.556  0.216    n/a
+synthetic held-out runs                    v2     10280    0.17  +0.48     0.936  0.952    n/a
+real 01 Mar infiltration                   v2      6726    0.51  +0.41      n/a    n/a    n/a
+real 02 Mar C2 (transfer)                  v2      6260    0.56  +0.06     0.342  0.076  0.000
+
+Honest takeaways:
+
+  • Synthetic held-out is strong (MITRE_acc≈0.936, mF1≈0.952). The
+    mass / multi-run drop fixed the fixture-mass problem for synth.
+  • Real 02 Mar C2 recall is still 0.000 under both v1 and v2 —
+    generator mass does NOT yet transfer to the real CIC C2 day.
+  • Combined scaler drifts real CIC features: z RMSE dims 0–28 =
+    0.822 (fails the <0.15 stability gate). dims 29–31 move as
+    expected (were stubs). blown_up_dims = none.
+  • Explainability sanity: recon not keyed only on ttl_variance = True;
+    evasive_can_cite_new_dims in why_attack = False (pass overall).
+
+
+9. ADAPTIVE LOOP + TTL WATCH
+----------------------------
+Run summary (20 cycles each):
+
+  evasive_c2_v1       baseline=1.000 → final=1.000  (drop +0.000)
+  evasive_lateral_v1  baseline=1.000 → final=1.000  (drop +0.000)
+  evasive_recon_v1    baseline=1.000 → final=1.000  (drop +0.000)
+
+Logs (all tagged real:score_history):
+
+  personas/adaptation_logs/evasive_c2_v1/
+    evasive_c2_v1__adapt__de881eb1dc.jsonl
+  personas/adaptation_logs/evasive_lateral_v1/
+    evasive_lateral_v1__adapt__94821ed51a.jsonl
+  personas/adaptation_logs/evasive_recon_v1/
+    evasive_recon_v1__adapt__e7b9940777.jsonl
+
+why_stage / TTL (probed via real score_history on generated tails):
+
+  • Stage heads are NOT TTL-only. Dominant why_stage features are
+    classic dims (port_scan_score, dest_port_entropy, pkt_len_mean,
+    bidirectional_ratio, syn_flag_sum, …).
+  • ttl_variance appears in why_change (often top-1 or top-2) for
+    evasive_c2 / evasive_lateral / evasive_recon — dynamics attribution,
+    not a stage shortcut.
+  • Hill-climb could not lower attack_probability below 1.0 against
+    the real v2 scorer with the current search spaces (20 cycles).
+
+
+10. ARTIFACTS WRITTEN THIS PASS
+-------------------------------
+Data / logs:
+
+  data/processed/state_windows_combined.npz
+  data/processed/state_windows_combined.json
+  data/processed/train_v2_real_personas.log
+  data/processed/eval_v2_real_personas.log
+  data/processed/adaptive_real_scorer.log
+
+Models (v1 untouched):
+
+  src/world_model/models/world_lstm_v2.pt
+  src/world_model/models/scaler_v2.npz
+  src/world_model/models/stage_decoder_v2.joblib
+  src/world_model/models/metrics_v2.json
+  src/world_model/models/v2_metrics.json
+
+Code:
+
+  src/world_model/dataset.py   (DAY_ID_DTYPE U64 → U128)
+
+Persona drop:
+
+  persona-gen/persona-gen/data/raw/personas/   (91 CSVs after --clean)
+
+
+11. WHAT DID NOT CHANGE
+-----------------------
+  • Frozen v1 checkpoints (world_lstm.pt, scaler.npz) — still the
+    quoted CIC baseline.
+  • STATE_FEATURE_ORDER / STAGE_NAMES / model architecture.
+  • Default data/raw/personas fixtures (still present; unused when
+    --personas-dir points at the generator).
+  • Frontend / dashboard.
+
+
+12. OPEN FOLLOW-UPS
+-------------------
+  1. Real 02 Mar C2 transfer still at C2_R=0.000 — needs feature /
+     distribution work beyond mass (divergence_report.csv is the
+     starting map).
+  2. Combined-scaler drift on dims 0–28 — consider real-only or
+     dual-scaler scoring for CIC slices so quoted real MSE stays
+     comparable.
+  3. Adaptive hill-climb stuck at P=1.0 vs real scorer — widen search
+     space or accept that current evasive knobs cannot fool v2.
+  4. Keep running adaptive from persona-gen/persona-gen with
+     PYTHONPATH=<repo root>; document that in README2 if not already.
+  5. Optional: symlink or copy the production drop into
+     data/raw/personas/ so default CLI paths match without
+     --personas-dir (do not leave fixtures in place if you do this).
+
+
+13. ONE-LINE VERDICT
+--------------------
+Full persona-gen drop is integrated: combined NPZ + v2 retrain + real
+scorer adaptive all green on contracts; synthetic held-out is strong;
+real CIC C2 transfer and combined-scaler stability remain the hard
+open problems — mass alone did not fix them.
+
+================================================================================
+END OF REPORT
+================================================================================

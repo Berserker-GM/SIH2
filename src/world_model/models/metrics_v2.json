@@ -1,7 +1,7 @@
 {
   "tag": "v2",
   "sizes": {
-    "n_total": 48870,
+    "n_total": 86212,
     "days_present": [
       "2018-02-14",
       "2018-02-15",
@@ -12,58 +12,198 @@
       "2018-02-28",
       "2018-03-01",
       "2018-03-02",
-      "syn:benign_office_v1:run_000",
-      "syn:benign_office_v1:run_001",
-      "syn:benign_office_v1:run_002",
-      "syn:bot_c2_beacon_v1:run_000",
-      "syn:bot_c2_beacon_v1:run_001",
-      "syn:bot_c2_beacon_v1:run_002",
-      "syn:evasive_lateral_v1:run_000",
-      "syn:evasive_lateral_v1:run_001",
-      "syn:evasive_lateral_v1:run_002",
-      "syn:exfil_dns_v1:run_000",
-      "syn:exfil_dns_v1:run_001",
-      "syn:exfil_dns_v1:run_002",
-      "syn:impact_flood_v1:run_000",
-      "syn:impact_flood_v1:run_001",
-      "syn:impact_flood_v1:run_002",
-      "syn:recon_portscan_v1:run_000",
-      "syn:recon_portscan_v1:run_001",
-      "syn:recon_portscan_v1:run_002",
-      "syn:ssh_bruteforce_v1:run_000",
-      "syn:ssh_bruteforce_v1:run_001",
-      "syn:ssh_bruteforce_v1:run_002"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_000",
+      "syn:benign_browsing_v1:benign_browsing_v1__run_001",
+      "syn:benign_browsing_v1:benign_browsing_v1__run_002",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_000",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_001",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_002",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_000",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_001",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_002",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_000",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_001",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_002",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_000",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_001",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_000",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_001",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_003",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_004",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_005",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_006",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_007",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_000",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_001",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_002",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_003",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_004",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_005",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_006",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_007",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_000",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_001",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_002",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_000",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_001",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_002",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_000",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_001",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_002",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_003",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_004",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_000",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_001",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_002",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_003",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_004",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_000",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_001",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_002",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_003",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_000",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_001",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_002",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_003",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_005",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_006",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_007",
+      "syn:infiltration_v1:infiltration_v1__run_000",
+      "syn:infiltration_v1:infiltration_v1__run_001",
+      "syn:infiltration_v1:infiltration_v1__run_002",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_000",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_001",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_000",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_001",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_003",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_004",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_005",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_006",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_007",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_000",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_001",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_002",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_003",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_004",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_005",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_006",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_007",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_000",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_001",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_002",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_000",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_001",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_002",
+      "syn:web_xss_v1:web_xss_v1__run_000",
+      "syn:web_xss_v1:web_xss_v1__run_001",
+      "syn:web_xss_v1:web_xss_v1__run_002"
     ],
     "split_mode": "day",
     "missing_train": [],
     "missing_val": [],
     "missing_test": [],
     "synth_train_days": [
-      "syn:benign_office_v1:run_000",
-      "syn:bot_c2_beacon_v1:run_000",
-      "syn:evasive_lateral_v1:run_000",
-      "syn:exfil_dns_v1:run_000",
-      "syn:impact_flood_v1:run_000",
-      "syn:recon_portscan_v1:run_000",
-      "syn:ssh_bruteforce_v1:run_000"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_000",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_000",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_000",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_000",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_000",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_000",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_001",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_003",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_004",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_005",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_000",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_001",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_002",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_003",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_004",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_005",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_000",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_000",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_000",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_001",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_002",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_000",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_001",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_002",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_000",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_001",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_002",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_000",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_001",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_002",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_003",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_005",
+      "syn:infiltration_v1:infiltration_v1__run_000",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_000",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_000",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_001",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_003",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_004",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_005",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_000",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_001",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_002",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_003",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_004",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_005",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_000",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_000",
+      "syn:web_xss_v1:web_xss_v1__run_000"
     ],
     "synth_val_days": [
-      "syn:benign_office_v1:run_001",
-      "syn:bot_c2_beacon_v1:run_001",
-      "syn:evasive_lateral_v1:run_001",
-      "syn:exfil_dns_v1:run_001",
-      "syn:impact_flood_v1:run_001",
-      "syn:recon_portscan_v1:run_001",
-      "syn:ssh_bruteforce_v1:run_001"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_001",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_001",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_001",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_001",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_001",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_006",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_006",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_001",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_001",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_003",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_003",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_003",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_006",
+      "syn:infiltration_v1:infiltration_v1__run_001",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_001",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_006",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_006",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_001",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_001",
+      "syn:web_xss_v1:web_xss_v1__run_001"
     ],
     "synth_test_days": [
-      "syn:benign_office_v1:run_002",
-      "syn:bot_c2_beacon_v1:run_002",
-      "syn:evasive_lateral_v1:run_002",
-      "syn:exfil_dns_v1:run_002",
-      "syn:impact_flood_v1:run_002",
-      "syn:recon_portscan_v1:run_002",
-      "syn:ssh_bruteforce_v1:run_002"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_002",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_002",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_002",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_002",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_007",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_007",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_002",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_002",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_004",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_004",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_007",
+      "syn:infiltration_v1:infiltration_v1__run_002",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_007",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_007",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_002",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_002",
+      "syn:web_xss_v1:web_xss_v1__run_002"
     ],
     "train_days": [
       "2018-02-14",
@@ -71,42 +211,112 @@
       "2018-02-16",
       "2018-02-22",
       "2018-02-28",
-      "syn:benign_office_v1:run_000",
-      "syn:bot_c2_beacon_v1:run_000",
-      "syn:evasive_lateral_v1:run_000",
-      "syn:exfil_dns_v1:run_000",
-      "syn:impact_flood_v1:run_000",
-      "syn:recon_portscan_v1:run_000",
-      "syn:ssh_bruteforce_v1:run_000"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_000",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_000",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_000",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_000",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_000",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_000",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_001",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_003",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_004",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_005",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_000",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_001",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_002",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_003",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_004",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_005",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_000",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_000",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_000",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_001",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_002",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_000",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_001",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_002",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_000",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_001",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_002",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_000",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_001",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_002",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_003",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_005",
+      "syn:infiltration_v1:infiltration_v1__run_000",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_000",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_000",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_001",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_003",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_004",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_005",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_000",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_001",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_002",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_003",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_004",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_005",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_000",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_000",
+      "syn:web_xss_v1:web_xss_v1__run_000"
     ],
     "val_days": [
       "2018-02-23",
-      "syn:benign_office_v1:run_001",
-      "syn:bot_c2_beacon_v1:run_001",
-      "syn:evasive_lateral_v1:run_001",
-      "syn:exfil_dns_v1:run_001",
-      "syn:impact_flood_v1:run_001",
-      "syn:recon_portscan_v1:run_001",
-      "syn:ssh_bruteforce_v1:run_001"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_001",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_001",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_001",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_001",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_001",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_006",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_006",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_001",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_001",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_003",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_003",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_003",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_006",
+      "syn:infiltration_v1:infiltration_v1__run_001",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_001",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_006",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_006",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_001",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_001",
+      "syn:web_xss_v1:web_xss_v1__run_001"
     ],
     "test_days": [
       "2018-02-21",
       "2018-03-01",
       "2018-03-02",
-      "syn:benign_office_v1:run_002",
-      "syn:bot_c2_beacon_v1:run_002",
-      "syn:evasive_lateral_v1:run_002",
-      "syn:exfil_dns_v1:run_002",
-      "syn:impact_flood_v1:run_002",
-      "syn:recon_portscan_v1:run_002",
-      "syn:ssh_bruteforce_v1:run_002"
+      "syn:benign_browsing_v1:benign_browsing_v1__run_002",
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_002",
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_002",
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_002",
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_002",
+      "syn:c2_beacon_v1:c2_beacon_v1__run_007",
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_007",
+      "syn:dos_hulk_v1:dos_hulk_v1__run_002",
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_002",
+      "syn:evasive_c2_v1:evasive_c2_v1__run_004",
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_004",
+      "syn:evasive_recon_v1:evasive_recon_v1__run_004",
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_007",
+      "syn:infiltration_v1:infiltration_v1__run_002",
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_002",
+      "syn:recon_portscan_v1:recon_portscan_v1__run_007",
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_007",
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_002",
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_002",
+      "syn:web_xss_v1:web_xss_v1__run_002"
     ],
-    "n_train": 27669,
-    "n_val": 6996,
-    "n_test": 14205,
+    "n_train": 44629,
+    "n_val": 17187,
+    "n_test": 24396,
     "seq_stats": {
-      "n_kept": 48347,
-      "n_rejected_day": 189,
+      "n_kept": 85199,
+      "n_rejected_day": 679,
       "n_rejected_gap": 313,
       "n_rejected_order": 0
     }
@@ -114,150 +324,228 @@
   "seq_len": 8,
   "input_dim": 32,
   "train_info": {
-    "best_val_loss": 1.1146798461920666,
-    "pos_weight": 3.0
+    "best_val_loss": 0.43410961621521377,
+    "pos_weight": 1.124807357788086
   },
-  "lstm_threshold_val_f1": 0.2,
-  "logreg_threshold_val_f1": 0.05,
+  "lstm_threshold_val_f1": 0.85,
+  "logreg_threshold_val_f1": 0.75,
   "attack_threshold_frozen": 0.15,
   "val": {
     "split": "val",
-    "n": 6933,
-    "pos_rate": 0.20294244587421417,
+    "n": 17033,
+    "pos_rate": 0.5525156855583191,
     "lstm_attack": {
-      "precision": 0.22898951947795135,
-      "recall": 0.8230277185501066,
-      "f1": 0.3582920792079208,
-      "fpr": 0.7055736518277235,
-      "accuracy": 0.4017020049040819,
-      "tp": 1158,
-      "fp": 3899,
-      "tn": 1627,
-      "fn": 249,
-      "support_pos": 1407,
-      "n": 6933
+      "precision": 0.9993943798449613,
+      "recall": 0.8767399851237913,
+      "f1": 0.9340578479651327,
+      "fpr": 0.0006559958016268696,
+      "accuracy": 0.9316033581870486,
+      "tp": 8251,
+      "fp": 5,
+      "tn": 7617,
+      "fn": 1160,
+      "support_pos": 9411,
+      "n": 17033
     },
     "logreg_attack": {
-      "precision": 0.20363372093023255,
-      "recall": 0.9957356076759062,
-      "f1": 0.33811994690479064,
-      "fpr": 0.9914947520810713,
-      "accuracy": 0.20885619500937544,
-      "tp": 1401,
-      "fp": 5479,
-      "tn": 47,
-      "fn": 6,
-      "support_pos": 1407,
-      "n": 6933
+      "precision": 0.9614629356897398,
+      "recall": 0.8324301349484645,
+      "f1": 0.8923059399738026,
+      "fpr": 0.04119653634216741,
+      "accuracy": 0.8889802148770035,
+      "tp": 7834,
+      "fp": 314,
+      "tn": 7308,
+      "fn": 1577,
+      "support_pos": 9411,
+      "n": 17033
     },
     "lstm_next_state": {
-      "mse": 0.6073036789894104,
-      "mae": 0.3494214117527008,
-      "rmse": 0.7792969132425782
+      "mse": 0.3198326528072357,
+      "mae": 0.20803114771842957,
+      "rmse": 0.5655374901871986
     },
     "persist_next_state": {
-      "mse": 0.8915696740150452,
-      "mae": 0.3596498370170593,
-      "rmse": 0.9442296722805554
+      "mse": 0.5718889832496643,
+      "mae": 0.22136759757995605,
+      "rmse": 0.7562334184956814
     },
-    "lstm_mse_reduction_vs_persist": 0.31883766721840945,
-    "lstm_threshold": 0.2,
-    "logreg_threshold": 0.05,
+    "lstm_mse_reduction_vs_persist": 0.440743462149175,
+    "lstm_threshold": 0.85,
+    "logreg_threshold": 0.75,
     "beats_logreg_f1": true,
     "beats_persist_mse": true,
     "by_day": {
       "2018-02-23": {
         "n": 6653,
         "lstm_attack": {
-          "precision": 0.19217081850533807,
-          "recall": 0.7866323907455013,
-          "f1": 0.3088829071332436,
-          "fpr": 0.7034269048487058,
-          "accuracy": 0.3825341950999549,
-          "tp": 918,
-          "fp": 3859,
-          "tn": 1627,
-          "fn": 249,
+          "precision": 0.5833333333333334,
+          "recall": 0.005998286203941731,
+          "f1": 0.011874469889737066,
+          "fpr": 0.0009114108640174991,
+          "accuracy": 0.8248910266045393,
+          "tp": 7,
+          "fp": 5,
+          "tn": 5481,
+          "fn": 1160,
           "support_pos": 1167,
           "n": 6653
         },
         "logreg_attack": {
-          "precision": 0.1758824420542342,
-          "recall": 0.9948586118251928,
-          "f1": 0.298918640576725,
-          "fpr": 0.991615020051039,
-          "accuracy": 0.18142191492559748,
-          "tp": 1161,
-          "fp": 5440,
-          "tn": 46,
-          "fn": 6,
+          "precision": 0.6111111111111112,
+          "recall": 0.009425878320479864,
+          "f1": 0.018565400843881856,
+          "fpr": 0.0012759752096244987,
+          "accuracy": 0.8251916428678792,
+          "tp": 11,
+          "fp": 7,
+          "tn": 5479,
+          "fn": 1156,
           "support_pos": 1167,
           "n": 6653
         },
         "lstm_next_state": {
-          "mse": 0.4508879482746124,
-          "mae": 0.3225364685058594,
-          "rmse": 0.6714819046516536
+          "mse": 0.5341188907623291,
+          "mae": 0.3157235085964203,
+          "rmse": 0.7308343798442497
         },
         "persist_next_state": {
-          "mse": 0.6960727572441101,
-          "mae": 0.33680638670921326,
-          "rmse": 0.8343097489806229
+          "mse": 0.9069882035255432,
+          "mae": 0.3287259340286255,
+          "rmse": 0.9523592827948616
         }
       },
-      "syn:benign_office_v1:run_001": {
-        "n": 40,
+      "syn:benign_browsing_v1:benign_browsing_v1__run_001": {
+        "n": 712,
         "lstm_attack": {
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "fpr": 1.0,
-          "accuracy": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
           "tp": 0,
-          "fp": 40,
-          "tn": 0,
+          "fp": 0,
+          "tn": 712,
           "fn": 0,
           "support_pos": 0,
-          "n": 40
+          "n": 712
         },
         "logreg_attack": {
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "fpr": 0.975,
-          "accuracy": 0.025,
+          "fpr": 0.20926966292134833,
+          "accuracy": 0.7907303370786517,
           "tp": 0,
-          "fp": 39,
-          "tn": 1,
+          "fp": 149,
+          "tn": 563,
           "fn": 0,
           "support_pos": 0,
-          "n": 40
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 2.139733076095581,
-          "mae": 0.815882682800293,
-          "rmse": 1.462782648275396
+          "mse": 0.26091453433036804,
+          "mae": 0.1738291233778,
+          "rmse": 0.510797938847024
         },
         "persist_next_state": {
-          "mse": 3.347203493118286,
-          "mae": 0.7538996338844299,
-          "rmse": 1.8295364148106716
+          "mse": 0.5222220420837402,
+          "mae": 0.20827218890190125,
+          "rmse": 0.722649321651754
         }
       },
-      "syn:bot_c2_beacon_v1:run_001": {
-        "n": 40,
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 0,
+          "fp": 0,
+          "tn": 712,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.014044943820224719,
+          "accuracy": 0.9859550561797753,
+          "tp": 0,
+          "fp": 10,
+          "tn": 702,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.9783064723014832,
+          "mae": 0.2671869099140167,
+          "rmse": 0.9890937631496233
+        },
+        "persist_next_state": {
+          "mse": 1.963294267654419,
+          "mae": 0.3090563118457794,
+          "rmse": 1.4011760302169098
+        }
+      },
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 0,
+          "fp": 0,
+          "tn": 712,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.20786516853932585,
+          "accuracy": 0.7921348314606742,
+          "tp": 0,
+          "fp": 148,
+          "tn": 564,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.024518264457583427,
+          "mae": 0.08309467136859894,
+          "rmse": 0.15658309122502156
+        },
+        "persist_next_state": {
+          "mse": 0.042368073016405106,
+          "mae": 0.08150399476289749,
+          "rmse": 0.20583506265066967
+        }
+      },
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_001": {
+        "n": 712,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -265,38 +553,38 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 6.7983856201171875,
-          "mae": 1.1069481372833252,
-          "rmse": 2.607371400494603
+          "mse": 0.03562099486589432,
+          "mae": 0.0957876518368721,
+          "rmse": 0.18873525072411437
         },
         "persist_next_state": {
-          "mse": 6.366325855255127,
-          "mae": 0.921666145324707,
-          "rmse": 2.523157913261698
+          "mse": 0.06243846192955971,
+          "mae": 0.09668763726949692,
+          "rmse": 0.24987689354872272
         }
       },
-      "syn:evasive_lateral_v1:run_001": {
-        "n": 40,
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_001": {
+        "n": 712,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -304,38 +592,38 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 9.797433853149414,
-          "mae": 1.2720601558685303,
-          "rmse": 3.1300852788940774
+          "mse": 0.04108189046382904,
+          "mae": 0.09625662863254547,
+          "rmse": 0.20268668052891153
         },
         "persist_next_state": {
-          "mse": 14.073263168334961,
-          "mae": 1.3545355796813965,
-          "rmse": 3.7514348146189294
+          "mse": 0.07523158937692642,
+          "mae": 0.102114237844944,
+          "rmse": 0.2742837752710255
         }
       },
-      "syn:exfil_dns_v1:run_001": {
-        "n": 40,
+      "syn:c2_beacon_v1:c2_beacon_v1__run_006": {
+        "n": 192,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -343,38 +631,77 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "lstm_next_state": {
-          "mse": 2.5041561126708984,
-          "mae": 0.9470769762992859,
-          "rmse": 1.5824525625341501
+          "mse": 0.017726704478263855,
+          "mae": 0.07331354171037674,
+          "rmse": 0.13314167070554528
         },
         "persist_next_state": {
-          "mse": 3.623271942138672,
-          "mae": 0.8129392862319946,
-          "rmse": 1.9034894121425188
+          "mse": 0.03026960790157318,
+          "mae": 0.06694873422384262,
+          "rmse": 0.17398163093146696
         }
       },
-      "syn:impact_flood_v1:run_001": {
-        "n": 40,
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_006": {
+        "n": 192,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.8020833333333334,
+          "f1": 0.8901734104046243,
+          "fpr": 0.0,
+          "accuracy": 0.8020833333333334,
+          "tp": 154,
+          "fp": 0,
+          "tn": 0,
+          "fn": 38,
+          "support_pos": 192,
+          "n": 192
+        },
+        "lstm_next_state": {
+          "mse": 0.02926490269601345,
+          "mae": 0.10939323902130127,
+          "rmse": 0.17106987664698145
+        },
+        "persist_next_state": {
+          "mse": 0.040510524064302444,
+          "mae": 0.0824907124042511,
+          "rmse": 0.20127226352456626
+        }
+      },
+      "syn:dos_hulk_v1:dos_hulk_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -382,38 +709,38 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 4.612649440765381,
-          "mae": 0.9970823526382446,
-          "rmse": 2.1477079505289773
+          "mse": 0.30001500248908997,
+          "mae": 0.19884386658668518,
+          "rmse": 0.5477362526701058
         },
         "persist_next_state": {
-          "mse": 4.696275234222412,
-          "mae": 0.9491669535636902,
-          "rmse": 2.1670891154316685
+          "mse": 0.5796724557876587,
+          "mae": 0.2370714396238327,
+          "rmse": 0.7613622369067556
         }
       },
-      "syn:recon_portscan_v1:run_001": {
-        "n": 40,
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_001": {
+        "n": 712,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -421,38 +748,155 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 2.3649590015411377,
-          "mae": 0.9128084182739258,
-          "rmse": 1.5378423201164473
+          "mse": 0.022338243201375008,
+          "mae": 0.08461820334196091,
+          "rmse": 0.14945983808828045
         },
         "persist_next_state": {
-          "mse": 3.6410117149353027,
-          "mae": 0.8154383897781372,
-          "rmse": 1.908143525769302
+          "mse": 0.03410431742668152,
+          "mae": 0.06901174783706665,
+          "rmse": 0.18467354284434334
         }
       },
-      "syn:ssh_bruteforce_v1:run_001": {
-        "n": 40,
+      "syn:evasive_c2_v1:evasive_c2_v1__run_003": {
+        "n": 292,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 292,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 292,
+          "n": 292
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9965753424657534,
+          "f1": 0.9982847341337907,
+          "fpr": 0.0,
+          "accuracy": 0.9965753424657534,
+          "tp": 291,
+          "fp": 0,
+          "tn": 0,
+          "fn": 1,
+          "support_pos": 292,
+          "n": 292
+        },
+        "lstm_next_state": {
+          "mse": 0.018215486779808998,
+          "mae": 0.07297349721193314,
+          "rmse": 0.13496476125199866
+        },
+        "persist_next_state": {
+          "mse": 0.03191883862018585,
+          "mae": 0.06850133836269379,
+          "rmse": 0.17865844122287045
+        }
+      },
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_003": {
+        "n": 292,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 292,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 292,
+          "n": 292
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.958904109589041,
+          "f1": 0.9790209790209791,
+          "fpr": 0.0,
+          "accuracy": 0.958904109589041,
+          "tp": 280,
+          "fp": 0,
+          "tn": 0,
+          "fn": 12,
+          "support_pos": 292,
+          "n": 292
+        },
+        "lstm_next_state": {
+          "mse": 0.1866530478000641,
+          "mae": 0.15220360457897186,
+          "rmse": 0.43203361883083136
+        },
+        "persist_next_state": {
+          "mse": 0.37643271684646606,
+          "mae": 0.17803539335727692,
+          "rmse": 0.6135411288955828
+        }
+      },
+      "syn:evasive_recon_v1:evasive_recon_v1__run_003": {
+        "n": 292,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 292,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 292,
+          "n": 292
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9931506849315068,
+          "f1": 0.9965635738831615,
+          "fpr": 0.0,
+          "accuracy": 0.9931506849315068,
+          "tp": 290,
+          "fp": 0,
+          "tn": 0,
+          "fn": 2,
+          "support_pos": 292,
+          "n": 292
+        },
+        "lstm_next_state": {
+          "mse": 0.026946203783154488,
+          "mae": 0.08547486364841461,
+          "rmse": 0.16415298895589592
+        },
+        "persist_next_state": {
+          "mse": 0.049609288573265076,
+          "mae": 0.09280652552843094,
+          "rmse": 0.22273142699957066
+        }
+      },
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_006": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -460,281 +904,905 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "lstm_next_state": {
-          "mse": 2.049652576446533,
-          "mae": 0.8657249212265015,
-          "rmse": 1.4316607756191875
+          "mse": 0.2527541220188141,
+          "mae": 0.15462304651737213,
+          "rmse": 0.5027465783263115
         },
         "persist_next_state": {
-          "mse": 3.0096499919891357,
-          "mae": 0.7093383073806763,
-          "rmse": 1.734834283725433
+          "mse": 0.4482317864894867,
+          "mae": 0.161617249250412,
+          "rmse": 0.669501147489298
+        }
+      },
+      "syn:infiltration_v1:infiltration_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9115168539325843,
+          "f1": 0.9537105069801617,
+          "fpr": 0.0,
+          "accuracy": 0.9115168539325843,
+          "tp": 649,
+          "fp": 0,
+          "tn": 0,
+          "fn": 63,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.4361104965209961,
+          "mae": 0.21556907892227173,
+          "rmse": 0.6603866265461439
+        },
+        "persist_next_state": {
+          "mse": 0.8895112872123718,
+          "mae": 0.26776236295700073,
+          "rmse": 0.9431390603788881
+        }
+      },
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9971910112359551,
+          "f1": 0.9985935302390999,
+          "fpr": 0.0,
+          "accuracy": 0.9971910112359551,
+          "tp": 710,
+          "fp": 0,
+          "tn": 0,
+          "fn": 2,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.19359740614891052,
+          "mae": 0.15950849652290344,
+          "rmse": 0.4399970524320709
+        },
+        "persist_next_state": {
+          "mse": 0.38003090023994446,
+          "mae": 0.17824774980545044,
+          "rmse": 0.6164664631915872
+        }
+      },
+      "syn:recon_portscan_v1:recon_portscan_v1__run_006": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "lstm_next_state": {
+          "mse": 0.025852015241980553,
+          "mae": 0.08969274163246155,
+          "rmse": 0.16078561889043608
+        },
+        "persist_next_state": {
+          "mse": 0.04351601377129555,
+          "mae": 0.09187356382608414,
+          "rmse": 0.20860492269190473
+        }
+      },
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_006": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.90625,
+          "f1": 0.9508196721311475,
+          "fpr": 0.0,
+          "accuracy": 0.90625,
+          "tp": 174,
+          "fp": 0,
+          "tn": 0,
+          "fn": 18,
+          "support_pos": 192,
+          "n": 192
+        },
+        "lstm_next_state": {
+          "mse": 0.031044458970427513,
+          "mae": 0.09215778857469559,
+          "rmse": 0.17619437837350974
+        },
+        "persist_next_state": {
+          "mse": 0.057069841772317886,
+          "mae": 0.10067105293273926,
+          "rmse": 0.2388929504450014
+        }
+      },
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.04455701261758804,
+          "mae": 0.12264127284288406,
+          "rmse": 0.21108532070607858
+        },
+        "persist_next_state": {
+          "mse": 0.07126256078481674,
+          "mae": 0.11892695724964142,
+          "rmse": 0.2669504837695874
+        }
+      },
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9550561797752809,
+          "f1": 0.9770114942528736,
+          "fpr": 0.0,
+          "accuracy": 0.9550561797752809,
+          "tp": 680,
+          "fp": 0,
+          "tn": 0,
+          "fn": 32,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.07365410774946213,
+          "mae": 0.13377223908901215,
+          "rmse": 0.27139290290916257
+        },
+        "persist_next_state": {
+          "mse": 0.1329018622636795,
+          "mae": 0.1457122415304184,
+          "rmse": 0.3645570768256728
+        }
+      },
+      "syn:web_xss_v1:web_xss_v1__run_001": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.6446629213483146,
+          "f1": 0.7839453458582408,
+          "fpr": 0.0,
+          "accuracy": 0.6446629213483146,
+          "tp": 459,
+          "fp": 0,
+          "tn": 0,
+          "fn": 253,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.058460261672735214,
+          "mae": 0.12801222503185272,
+          "rmse": 0.24178556961228106
+        },
+        "persist_next_state": {
+          "mse": 0.09823336452245712,
+          "mae": 0.13473409414291382,
+          "rmse": 0.3134220230335723
         }
       }
     }
   },
   "test": {
     "split": "test",
-    "n": 13938,
-    "pos_rate": 0.489022821187973,
+    "n": 24038,
+    "pos_rate": 0.6165238618850708,
     "lstm_attack": {
-      "precision": 0.7342171717171717,
-      "recall": 0.34125586854460094,
-      "f1": 0.46594551282051283,
-      "fpr": 0.11822521763549565,
-      "accuracy": 0.6174487013918784,
-      "tp": 2326,
-      "fp": 842,
-      "tn": 6280,
-      "fn": 4490,
-      "support_pos": 6816,
-      "n": 13938
+      "precision": 0.9865215654952076,
+      "recall": 0.6667341430499325,
+      "f1": 0.7956997906265099,
+      "fpr": 0.014645259275330875,
+      "accuracy": 0.7889175472169065,
+      "tp": 9881,
+      "fp": 135,
+      "tn": 9083,
+      "fn": 4939,
+      "support_pos": 14820,
+      "n": 24038
     },
     "logreg_attack": {
-      "precision": 0.5018189917588537,
-      "recall": 0.991637323943662,
-      "f1": 0.6664037466107962,
-      "fpr": 0.9421510811569784,
-      "accuracy": 0.5144927536231884,
-      "tp": 6759,
-      "fp": 6710,
-      "tn": 412,
-      "fn": 57,
-      "support_pos": 6816,
-      "n": 13938
+      "precision": 0.9550707419807755,
+      "recall": 0.596693657219973,
+      "f1": 0.7344989409859214,
+      "fpr": 0.04512909524842699,
+      "accuracy": 0.7340460936849987,
+      "tp": 8843,
+      "fp": 416,
+      "tn": 8802,
+      "fn": 5977,
+      "support_pos": 14820,
+      "n": 24038
     },
     "lstm_next_state": {
-      "mse": 44.01285934448242,
-      "mae": 0.6568141579627991,
-      "rmse": 6.634218819460391
+      "mse": 38.71664810180664,
+      "mae": 0.4343821704387665,
+      "rmse": 6.222270333391715
     },
     "persist_next_state": {
-      "mse": 9.540583610534668,
-      "mae": 0.41671934723854065,
-      "rmse": 3.088783516294832
+      "mse": 8.474922180175781,
+      "mae": 0.2888738214969635,
+      "rmse": 2.9111719599116404
     },
-    "lstm_mse_reduction_vs_persist": -3.613225054270645,
-    "lstm_threshold": 0.2,
-    "logreg_threshold": 0.05,
-    "beats_logreg_f1": false,
+    "lstm_mse_reduction_vs_persist": -3.5683780073368894,
+    "lstm_threshold": 0.85,
+    "logreg_threshold": 0.75,
+    "beats_logreg_f1": true,
     "beats_persist_mse": false,
     "by_day": {
       "2018-02-21": {
         "n": 647,
         "lstm_attack": {
-          "precision": 0.9365942028985508,
-          "recall": 0.8447712418300654,
-          "f1": 0.8883161512027491,
+          "precision": 0.8985507246376812,
+          "recall": 0.5065359477124183,
+          "f1": 0.6478578892371996,
           "fpr": 1.0,
-          "accuracy": 0.7990726429675425,
-          "tp": 517,
+          "accuracy": 0.47913446676970634,
+          "tp": 310,
           "fp": 35,
           "tn": 0,
-          "fn": 95,
+          "fn": 302,
           "support_pos": 612,
           "n": 647
         },
         "logreg_attack": {
-          "precision": 0.9459041731066461,
-          "recall": 1.0,
-          "f1": 0.9722001588562351,
-          "fpr": 1.0,
-          "accuracy": 0.9459041731066461,
-          "tp": 612,
-          "fp": 35,
-          "tn": 0,
-          "fn": 0,
+          "precision": 0.9508716323296355,
+          "recall": 0.9803921568627451,
+          "f1": 0.9654062751407884,
+          "fpr": 0.8857142857142857,
+          "accuracy": 0.9335394126738794,
+          "tp": 600,
+          "fp": 31,
+          "tn": 4,
+          "fn": 12,
           "support_pos": 612,
           "n": 647
         },
         "lstm_next_state": {
-          "mse": 935.235595703125,
-          "mae": 6.07166051864624,
-          "rmse": 30.58162186188177
+          "mse": 1425.955810546875,
+          "mae": 6.994053840637207,
+          "rmse": 37.76183007412214
         },
         "persist_next_state": {
-          "mse": 189.01988220214844,
-          "mae": 1.497449517250061,
-          "rmse": 13.748450174552346
+          "mse": 297.0169677734375,
+          "mae": 1.8336524963378906,
+          "rmse": 17.234180217620956
         }
       },
       "2018-03-01": {
         "n": 6741,
         "lstm_attack": {
-          "precision": 0.6254681647940075,
-          "recall": 0.6251336898395722,
-          "f1": 0.6253008825889276,
-          "fpr": 0.1437076575651817,
-          "accuracy": 0.792167334223409,
-          "tp": 1169,
-          "fp": 700,
-          "tn": 4171,
-          "fn": 701,
+          "precision": 0.8440944881889764,
+          "recall": 0.28663101604278074,
+          "f1": 0.4279441117764471,
+          "fpr": 0.020324368712789982,
+          "accuracy": 0.787420264055778,
+          "tp": 536,
+          "fp": 99,
+          "tn": 4772,
+          "fn": 1334,
           "support_pos": 1870,
           "n": 6741
         },
         "logreg_attack": {
-          "precision": 0.28770816812053923,
-          "recall": 0.9700534759358289,
-          "f1": 0.4437920489296636,
-          "fpr": 0.9219872716074728,
-          "accuracy": 0.32547099836819465,
-          "tp": 1814,
-          "fp": 4491,
-          "tn": 380,
-          "fn": 56,
+          "precision": 0.9166666666666666,
+          "recall": 0.011764705882352941,
+          "f1": 0.023231256599788808,
+          "fpr": 0.0004105933073290905,
+          "accuracy": 0.7255600059338377,
+          "tp": 22,
+          "fp": 2,
+          "tn": 4869,
+          "fn": 1848,
           "support_pos": 1870,
           "n": 6741
         },
         "lstm_next_state": {
-          "mse": 0.5965542197227478,
-          "mae": 0.38713371753692627,
-          "rmse": 0.7723692249971822
+          "mse": 0.47334980964660645,
+          "mae": 0.3436160385608673,
+          "rmse": 0.6880042221139391
         },
         "persist_next_state": {
-          "mse": 0.9448954463005066,
-          "mae": 0.4202952980995178,
-          "rmse": 0.9720573266533752
+          "mse": 0.7423954010009766,
+          "mae": 0.37522122263908386,
+          "rmse": 0.8616237003477658
         }
       },
       "2018-03-02": {
         "n": 6270,
         "lstm_attack": {
-          "precision": 0.8565310492505354,
-          "recall": 0.09770395701025891,
-          "f1": 0.17540013155009868,
-          "fpr": 0.03079044117647059,
-          "accuracy": 0.4001594896331738,
-          "tp": 400,
-          "fp": 67,
-          "tn": 2109,
-          "fn": 3694,
+          "precision": 0.9987389659520807,
+          "recall": 0.19345383488031265,
+          "f1": 0.3241252302025783,
+          "fpr": 0.00045955882352941176,
+          "accuracy": 0.47320574162679424,
+          "tp": 792,
+          "fp": 1,
+          "tn": 2175,
+          "fn": 3302,
           "support_pos": 4094,
           "n": 6270
         },
         "logreg_attack": {
-          "precision": 0.6562449895783229,
-          "recall": 0.9997557401074744,
-          "f1": 0.7923724712031749,
-          "fpr": 0.9852941176470589,
-          "accuracy": 0.6578947368421053,
-          "tp": 4093,
-          "fp": 2144,
-          "tn": 32,
+          "precision": 0.9702517162471396,
+          "recall": 0.10356619443087445,
+          "f1": 0.1871551533877731,
+          "fpr": 0.0059742647058823525,
+          "accuracy": 0.41259968102073363,
+          "tp": 424,
+          "fp": 13,
+          "tn": 2163,
+          "fn": 3670,
+          "support_pos": 4094,
+          "n": 6270
+        },
+        "lstm_next_state": {
+          "mse": 0.4942200481891632,
+          "mae": 0.34560418128967285,
+          "rmse": 0.7030078578431135
+        },
+        "persist_next_state": {
+          "mse": 0.4880003035068512,
+          "mae": 0.2669646441936493,
+          "rmse": 0.6985701850972823
+        }
+      },
+      "syn:benign_browsing_v1:benign_browsing_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 0,
+          "fp": 0,
+          "tn": 712,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.2612359550561798,
+          "accuracy": 0.7387640449438202,
+          "tp": 0,
+          "fp": 186,
+          "tn": 526,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.2522502541542053,
+          "mae": 0.1718214899301529,
+          "rmse": 0.5022452131720175
+        },
+        "persist_next_state": {
+          "mse": 0.509896457195282,
+          "mae": 0.2032345086336136,
+          "rmse": 0.7140703447107168
+        }
+      },
+      "syn:benign_bulk_transfer_v1:benign_bulk_transfer_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 0,
+          "fp": 0,
+          "tn": 712,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.016853932584269662,
+          "accuracy": 0.9831460674157303,
+          "tp": 0,
+          "fp": 12,
+          "tn": 700,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.8684559464454651,
+          "mae": 0.26114773750305176,
+          "rmse": 0.9319098381525248
+        },
+        "persist_next_state": {
+          "mse": 1.709534764289856,
+          "mae": 0.28968754410743713,
+          "rmse": 1.307491783641433
+        }
+      },
+      "syn:benign_iot_idle_v1:benign_iot_idle_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 0,
+          "fp": 0,
+          "tn": 712,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "fpr": 0.24157303370786518,
+          "accuracy": 0.7584269662921348,
+          "tp": 0,
+          "fp": 172,
+          "tn": 540,
+          "fn": 0,
+          "support_pos": 0,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.02337866649031639,
+          "mae": 0.08202379941940308,
+          "rmse": 0.15290083874955163
+        },
+        "persist_next_state": {
+          "mse": 0.03952835127711296,
+          "mae": 0.07860849797725677,
+          "rmse": 0.19881738172783828
+        }
+      },
+      "syn:bruteforce_ftp_v1:bruteforce_ftp_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.034740861505270004,
+          "mae": 0.09495244175195694,
+          "rmse": 0.18638900585943904
+        },
+        "persist_next_state": {
+          "mse": 0.057093434035778046,
+          "mae": 0.09290223568677902,
+          "rmse": 0.23894232365945145
+        }
+      },
+      "syn:bruteforce_ssh_v1:bruteforce_ssh_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.041380707174539566,
+          "mae": 0.09751403331756592,
+          "rmse": 0.2034224844370444
+        },
+        "persist_next_state": {
+          "mse": 0.07578524947166443,
+          "mae": 0.10293285548686981,
+          "rmse": 0.27529120848960004
+        }
+      },
+      "syn:c2_beacon_v1:c2_beacon_v1__run_007": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "lstm_next_state": {
+          "mse": 0.016469119116663933,
+          "mae": 0.0713033676147461,
+          "rmse": 0.12833206581624068
+        },
+        "persist_next_state": {
+          "mse": 0.02614033780992031,
+          "mae": 0.06120962277054787,
+          "rmse": 0.16167973840256022
+        }
+      },
+      "syn:c2_dns_tunnel_v1:c2_dns_tunnel_v1__run_007": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.7916666666666666,
+          "f1": 0.8837209302325582,
+          "fpr": 0.0,
+          "accuracy": 0.7916666666666666,
+          "tp": 152,
+          "fp": 0,
+          "tn": 0,
+          "fn": 40,
+          "support_pos": 192,
+          "n": 192
+        },
+        "lstm_next_state": {
+          "mse": 0.030005307868123055,
+          "mae": 0.11121811717748642,
+          "rmse": 0.17322040257464782
+        },
+        "persist_next_state": {
+          "mse": 0.03922030329704285,
+          "mae": 0.08112030476331711,
+          "rmse": 0.1980411656627047
+        }
+      },
+      "syn:dos_hulk_v1:dos_hulk_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.30463725328445435,
+          "mae": 0.2014005482196808,
+          "rmse": 0.5519395377072152
+        },
+        "persist_next_state": {
+          "mse": 0.5819481611251831,
+          "mae": 0.23769937455654144,
+          "rmse": 0.7628552687929625
+        }
+      },
+      "syn:dos_slowloris_v1:dos_slowloris_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.022562166675925255,
+          "mae": 0.08474341779947281,
+          "rmse": 0.15020707931361044
+        },
+        "persist_next_state": {
+          "mse": 0.034701813012361526,
+          "mae": 0.0696568712592125,
+          "rmse": 0.18628422641856054
+        }
+      },
+      "syn:evasive_c2_v1:evasive_c2_v1__run_004": {
+        "n": 292,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 292,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 292,
+          "n": 292
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9965753424657534,
+          "f1": 0.9982847341337907,
+          "fpr": 0.0,
+          "accuracy": 0.9965753424657534,
+          "tp": 291,
+          "fp": 0,
+          "tn": 0,
           "fn": 1,
-          "support_pos": 4094,
-          "n": 6270
+          "support_pos": 292,
+          "n": 292
         },
         "lstm_next_state": {
-          "mse": 0.485534131526947,
-          "mae": 0.37233540415763855,
-          "rmse": 0.6968027924218925
+          "mse": 0.01962430216372013,
+          "mae": 0.07408276945352554,
+          "rmse": 0.14008676655458976
         },
         "persist_next_state": {
-          "mse": 0.4074191153049469,
-          "mae": 0.2780037522315979,
-          "rmse": 0.6382939098134549
+          "mse": 0.035953983664512634,
+          "mae": 0.07109761238098145,
+          "rmse": 0.18961535714311917
         }
       },
-      "syn:benign_office_v1:run_002": {
-        "n": 40,
-        "lstm_attack": {
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
-          "fpr": 1.0,
-          "accuracy": 0.0,
-          "tp": 0,
-          "fp": 40,
-          "tn": 0,
-          "fn": 0,
-          "support_pos": 0,
-          "n": 40
-        },
-        "logreg_attack": {
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
-          "fpr": 1.0,
-          "accuracy": 0.0,
-          "tp": 0,
-          "fp": 40,
-          "tn": 0,
-          "fn": 0,
-          "support_pos": 0,
-          "n": 40
-        },
-        "lstm_next_state": {
-          "mse": 2.298602819442749,
-          "mae": 0.8416293859481812,
-          "rmse": 1.516114382044689
-        },
-        "persist_next_state": {
-          "mse": 3.886934757232666,
-          "mae": 0.8301318287849426,
-          "rmse": 1.9715310693044292
-        }
-      },
-      "syn:bot_c2_beacon_v1:run_002": {
-        "n": 40,
+      "syn:evasive_lateral_v1:evasive_lateral_v1__run_004": {
+        "n": 292,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 292,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 292,
+          "n": 292
         },
         "logreg_attack": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
+          "recall": 0.9554794520547946,
+          "f1": 0.9772329246935202,
           "fpr": 0.0,
-          "accuracy": 1.0,
-          "tp": 40,
+          "accuracy": 0.9554794520547946,
+          "tp": 279,
           "fp": 0,
           "tn": 0,
-          "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "fn": 13,
+          "support_pos": 292,
+          "n": 292
         },
         "lstm_next_state": {
-          "mse": 7.879889488220215,
-          "mae": 1.1816495656967163,
-          "rmse": 2.807114085358879
+          "mse": 0.1622721552848816,
+          "mae": 0.15225966274738312,
+          "rmse": 0.4028301816955646
         },
         "persist_next_state": {
-          "mse": 7.542638301849365,
-          "mae": 1.0014209747314453,
-          "rmse": 2.746386407963993
+          "mse": 0.31072115898132324,
+          "mae": 0.17308127880096436,
+          "rmse": 0.5574236799610537
         }
       },
-      "syn:evasive_lateral_v1:run_002": {
-        "n": 40,
+      "syn:evasive_recon_v1:evasive_recon_v1__run_004": {
+        "n": 292,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 292,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 292,
+          "n": 292
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -742,38 +1810,38 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 292,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 292,
+          "n": 292
         },
         "lstm_next_state": {
-          "mse": 10.250163078308105,
-          "mae": 1.2460628747940063,
-          "rmse": 3.2015875871679826
+          "mse": 0.02799135074019432,
+          "mae": 0.08546660840511322,
+          "rmse": 0.16730615870371993
         },
         "persist_next_state": {
-          "mse": 16.562597274780273,
-          "mae": 1.4045472145080566,
-          "rmse": 4.069717100091881
+          "mse": 0.048482514917850494,
+          "mae": 0.08910827338695526,
+          "rmse": 0.22018745404280077
         }
       },
-      "syn:exfil_dns_v1:run_002": {
-        "n": 40,
+      "syn:exfil_c2channel_v1:exfil_c2channel_v1__run_007": {
+        "n": 192,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -781,38 +1849,116 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "lstm_next_state": {
-          "mse": 2.5673279762268066,
-          "mae": 0.9468475580215454,
-          "rmse": 1.602288356141555
+          "mse": 0.35572946071624756,
+          "mae": 0.1661577820777893,
+          "rmse": 0.5964306000837378
         },
         "persist_next_state": {
-          "mse": 3.0668461322784424,
-          "mae": 0.7126650810241699,
-          "rmse": 1.7512413118352486
+          "mse": 0.7495102286338806,
+          "mae": 0.1935126930475235,
+          "rmse": 0.8657425879751328
         }
       },
-      "syn:impact_flood_v1:run_002": {
-        "n": 40,
+      "syn:infiltration_v1:infiltration_v1__run_002": {
+        "n": 712,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.8778089887640449,
+          "f1": 0.9349289454001496,
+          "fpr": 0.0,
+          "accuracy": 0.8778089887640449,
+          "tp": 625,
+          "fp": 0,
+          "tn": 0,
+          "fn": 87,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.3767864406108856,
+          "mae": 0.2102441042661667,
+          "rmse": 0.6138293253102899
+        },
+        "persist_next_state": {
+          "mse": 0.7744781970977783,
+          "mae": 0.2561204135417938,
+          "rmse": 0.8800444290476352
+        }
+      },
+      "syn:lateral_movement_smb_v1:lateral_movement_smb_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 712,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9971910112359551,
+          "f1": 0.9985935302390999,
+          "fpr": 0.0,
+          "accuracy": 0.9971910112359551,
+          "tp": 710,
+          "fp": 0,
+          "tn": 0,
+          "fn": 2,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.20007210969924927,
+          "mae": 0.15678052604198456,
+          "rmse": 0.4472942093289933
+        },
+        "persist_next_state": {
+          "mse": 0.39000484347343445,
+          "mae": 0.1722661852836609,
+          "rmse": 0.6245036777100952
+        }
+      },
+      "syn:recon_portscan_v1:recon_portscan_v1__run_007": {
+        "n": 192,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "fpr": 0.0,
+          "accuracy": 1.0,
+          "tp": 192,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "support_pos": 192,
+          "n": 192
         },
         "logreg_attack": {
           "precision": 1.0,
@@ -820,100 +1966,178 @@
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "lstm_next_state": {
-          "mse": 4.645078659057617,
-          "mae": 1.0065906047821045,
-          "rmse": 2.1552444545938676
+          "mse": 0.026239851489663124,
+          "mae": 0.0912649855017662,
+          "rmse": 0.16198719544971177
         },
         "persist_next_state": {
-          "mse": 6.051301002502441,
-          "mae": 1.074871301651001,
-          "rmse": 2.45993922740023
+          "mse": 0.047625403851270676,
+          "mae": 0.0980789065361023,
+          "rmse": 0.2182324537076708
         }
       },
-      "syn:recon_portscan_v1:run_002": {
-        "n": 40,
+      "syn:recon_service_discovery_v1:recon_service_discovery_v1__run_007": {
+        "n": 192,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 192,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 192,
+          "n": 192
         },
         "logreg_attack": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
+          "recall": 0.8854166666666666,
+          "f1": 0.9392265193370166,
           "fpr": 0.0,
-          "accuracy": 1.0,
-          "tp": 40,
+          "accuracy": 0.8854166666666666,
+          "tp": 170,
           "fp": 0,
           "tn": 0,
-          "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "fn": 22,
+          "support_pos": 192,
+          "n": 192
         },
         "lstm_next_state": {
-          "mse": 2.4929566383361816,
-          "mae": 0.9573253393173218,
-          "rmse": 1.5789099525736676
+          "mse": 0.030603164806962013,
+          "mae": 0.0914449468255043,
+          "rmse": 0.17493760261007926
         },
         "persist_next_state": {
-          "mse": 4.014983654022217,
-          "mae": 0.8836036920547485,
-          "rmse": 2.003742412093485
+          "mse": 0.05557942017912865,
+          "mae": 0.09838929772377014,
+          "rmse": 0.2357528794715531
         }
       },
-      "syn:ssh_bruteforce_v1:run_002": {
-        "n": 40,
+      "syn:web_bruteforce_v1:web_bruteforce_v1__run_002": {
+        "n": 712,
         "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
         },
         "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9985955056179775,
+          "f1": 0.9992972593113141,
+          "fpr": 0.0,
+          "accuracy": 0.9985955056179775,
+          "tp": 711,
+          "fp": 0,
+          "tn": 0,
+          "fn": 1,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.044260744005441666,
+          "mae": 0.12131907790899277,
+          "rmse": 0.2103823757006315
+        },
+        "persist_next_state": {
+          "mse": 0.07361956685781479,
+          "mae": 0.11893714964389801,
+          "rmse": 0.2713292591259092
+        }
+      },
+      "syn:web_sql_injection_v1:web_sql_injection_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
           "fpr": 0.0,
           "accuracy": 1.0,
-          "tp": 40,
+          "tp": 712,
           "fp": 0,
           "tn": 0,
           "fn": 0,
-          "support_pos": 40,
-          "n": 40
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.9508426966292135,
+          "f1": 0.9748020158387329,
+          "fpr": 0.0,
+          "accuracy": 0.9508426966292135,
+          "tp": 677,
+          "fp": 0,
+          "tn": 0,
+          "fn": 35,
+          "support_pos": 712,
+          "n": 712
         },
         "lstm_next_state": {
-          "mse": 2.0722782611846924,
-          "mae": 0.8723984956741333,
-          "rmse": 1.439540989754961
+          "mse": 0.0722065344452858,
+          "mae": 0.13234376907348633,
+          "rmse": 0.26871273591939365
         },
         "persist_next_state": {
-          "mse": 2.793027639389038,
-          "mae": 0.6700117588043213,
-          "rmse": 1.671235363253494
+          "mse": 0.13624128699302673,
+          "mae": 0.14522872865200043,
+          "rmse": 0.36910877393124475
+        }
+      },
+      "syn:web_xss_v1:web_xss_v1__run_002": {
+        "n": 712,
+        "lstm_attack": {
+          "precision": 1.0,
+          "recall": 0.9985955056179775,
+          "f1": 0.9992972593113141,
+          "fpr": 0.0,
+          "accuracy": 0.9985955056179775,
+          "tp": 711,
+          "fp": 0,
+          "tn": 0,
+          "fn": 1,
+          "support_pos": 712,
+          "n": 712
+        },
+        "logreg_attack": {
+          "precision": 1.0,
+          "recall": 0.6544943820224719,
+          "f1": 0.7911714770797963,
+          "fpr": 0.0,
+          "accuracy": 0.6544943820224719,
+          "tp": 466,
+          "fp": 0,
+          "tn": 0,
+          "fn": 246,
+          "support_pos": 712,
+          "n": 712
+        },
+        "lstm_next_state": {
+          "mse": 0.0603773258626461,
+          "mae": 0.1275525689125061,
+          "rmse": 0.24571798034056463
+        },
+        "persist_next_state": {
+          "mse": 0.10361158102750778,
+          "mae": 0.13555821776390076,
+          "rmse": 0.32188752853676666
         }
       }
     }
