@@ -1,5 +1,5 @@
 """
-graph_builder.py — Dev 3 (Ronit)
+graph_builder.py 
 
 Maintains an in-memory directed attack graph as a NetworkX DiGraph.
 Subscribes to Redis channel features:graph and processes GRAPH_EDGE objects
